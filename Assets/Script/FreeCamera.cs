@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
 public class FreeCamera : MonoBehaviour {
-	public bool enableInputCapture = true;
-	public bool holdRightMouseCapture = false;
+	//public bool enableInputCapture = true;
+	//public bool holdRightMouseCapture = false;
 
 	public float mouseTurnSpeed = 5f;
 	public float moveSpeed = 5f;
@@ -12,19 +12,19 @@ public class FreeCamera : MonoBehaviour {
 	float	m_yaw;
 	float	m_pitch;
 	
-	void Awake() {
-		enabled = enableInputCapture;
-	}
+	//void Awake() {
+	//	enabled = enableInputCapture;
+	//}
 
-	void OnValidate() {
-		if(Application.isPlaying)
-			enabled = enableInputCapture;
-	}
+	//void OnValidate() {
+	//	if(Application.isPlaying)
+	//		enabled = enableInputCapture;
+	//}
 
 	void CaptureInput() {
-		Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
 
-		Cursor.visible = false;
 		m_inputCaptured = true;
 
 		m_yaw = transform.eulerAngles.y;
@@ -32,8 +32,9 @@ public class FreeCamera : MonoBehaviour {
 	}
 
 	void ReleaseInput() {
-		Cursor.lockState = CursorLockMode.None;
-		Cursor.visible = true;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
 		m_inputCaptured = false;
 	}
 
@@ -43,22 +44,21 @@ public class FreeCamera : MonoBehaviour {
 	}
 
 	void Update() {
-		if(!m_inputCaptured) {
-			if(!holdRightMouseCapture && Input.GetMouseButtonDown(0)) 
-				CaptureInput();
-			else if(holdRightMouseCapture && Input.GetMouseButtonDown(1))
-				CaptureInput();
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (!m_inputCaptured)
+            {
+                CaptureInput();
+            }
+            else if (m_inputCaptured)
+            {
+                ReleaseInput();
+            }
 		}
 
 		if(!m_inputCaptured)
 			return;
 
-		if(m_inputCaptured) {
-			if(!holdRightMouseCapture && Input.GetKeyDown(KeyCode.Escape))
-				ReleaseInput();
-			else if(holdRightMouseCapture && Input.GetMouseButtonUp(1))
-				ReleaseInput();
-		}
 
 		var rotStrafe = Input.GetAxis("Mouse X");
 		var rotFwd = Input.GetAxis("Mouse Y");
