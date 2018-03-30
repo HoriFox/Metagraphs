@@ -282,7 +282,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Script\CreateTestGraph.cs" />
+    <Compile Include="Assets\Script\CreateTestLine.cs" />
     <Compile Include="Assets\Script\FreeCamera.cs" />
+    <Compile Include="Assets\Script\Graph.cs" />
+    <Compile Include="Assets\Script\Line.cs" />
     <Compile Include="Assets\Script\ProgramScrips.cs" />
     <Compile Include="Assets\Script\Serialization.cs" />
   </ItemGroup>
