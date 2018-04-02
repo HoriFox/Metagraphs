@@ -207,10 +207,10 @@ MonoBehaviour:
     y: 0
     width: 420
     height: 768
-  m_MinSize: {x: 277, y: 292}
-  m_MaxSize: {x: 4002, y: 8042}
+  m_MinSize: {x: 277, y: 271}
+  m_MaxSize: {x: 4002, y: 8021}
   vertical: 1
-  controlID: 101
+  controlID: 91
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -255,8 +255,8 @@ MonoBehaviour:
     y: 263
     width: 420
     height: 505
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 277, y: 71}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 19}
   m_Panes:
   - {fileID: 19}
@@ -309,7 +309,7 @@ MonoBehaviour:
     m_HSlider: 0
     m_VSlider: 0
     m_IgnoreScrollWheelUntilClicked: 0
-    m_EnableMouseInput: 0
+    m_EnableMouseInput: 1
     m_EnableSliderZoom: 0
     m_UniformScale: 1
     m_UpDirection: 1
@@ -367,14 +367,14 @@ MonoBehaviour:
     height: 264
   m_PersistentViewDataDictionary: {fileID: 0}
   m_SceneLighting: 1
-  lastFramingTime: 20128.355548313357
+  lastFramingTime: 4783.079935279806
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 10.977663, y: -6.061421, z: 39.171753}
+    m_Target: {x: 35.63917, y: 30.041677, z: -44.591568}
     speed: 2
-    m_Value: {x: 10.977663, y: -6.061421, z: 39.171753}
+    m_Value: {x: 35.63917, y: 30.041677, z: -44.591568}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -398,13 +398,13 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: -0.049780376, y: -0.024864363, z: 0.0012411004, w: -0.9984499}
+    m_Target: {x: -0.07366493, y: -0.048749555, z: 0.0036077176, w: -0.99608433}
     speed: 2
-    m_Value: {x: -0.049780376, y: -0.024864363, z: 0.0012411004, w: -0.9984499}
+    m_Value: {x: -0.07366493, y: -0.048749555, z: 0.0036077176, w: -0.99608433}
   m_Size:
-    m_Target: 23.998728
+    m_Target: 29.950483
     speed: 2
-    m_Value: 23.998728
+    m_Value: 29.950483
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -581,18 +581,18 @@ MonoBehaviour:
     m_ExpandedInstanceIDs: 04390000ce2a000000000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: Create
+      m_OriginalName: Create
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: 1844
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 8}
     m_CreateAssetUtility:
@@ -636,7 +636,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 9efbffff00000000
+    m_ExpandedIDs: 605efcff76cffcff9efbffff000000001e280000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

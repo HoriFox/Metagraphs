@@ -11,17 +11,18 @@ public class ProgramScrips : MonoBehaviour
 
     public static List<Serialization> savedGames = new List<Serialization>();
 
-    public static void Save() // Экспорт (сохранение)
+    public void Save() // Экспорт (сохранение)
     {
         savedGames.Add(Serialization.current);
         BinaryFormatter bf = new BinaryFormatter();
-        //Application.persistentDataPath это строка; выведите ее в логах и вы увидите расположение файла сохранений
         FileStream file = File.Create(Application.persistentDataPath + "/saved.gd");
         bf.Serialize(file, savedGames);
         file.Close();
     }
 
-    public static void Load() // Импорт (загрузка)
+    //C:\Users\Администратор\Documents\Metagraphs
+
+    public void Load() // Импорт (загрузка)
     {
         if (File.Exists(Application.persistentDataPath + "/saved.gd"))
         {
@@ -29,18 +30,13 @@ public class ProgramScrips : MonoBehaviour
             FileStream file = File.Open(Application.persistentDataPath + "/saved.gd", FileMode.Open);
             savedGames = (List<Serialization>)bf.Deserialize(file);
             file.Close();
-            //savedGames мучаем данную переменную и достаём данные
+            //savedGames // Мучаем данную переменную и достаём данные
         }
     }
 
     public void MakeScreenShot() // Сделать скриншот
     {
         StartCoroutine("Capture");
-    }
-
-    public void Quit() // Выйти из приложения
-    {
-        Application.Quit();
     }
 
     IEnumerator Capture()
@@ -54,5 +50,10 @@ public class ProgramScrips : MonoBehaviour
         byte[] bytes = screenCap.EncodeToPNG();
         string timeAndData = System.DateTime.Now.ToString("hh-mm-ss MM-dd-yyyy");
         File.WriteAllBytes(Application.dataPath + "/Screenshot/" + timeAndData + ".png", bytes);
+    }
+
+    public void Quit() // Выйти из приложения
+    {
+        Application.Quit();
     }
 }
