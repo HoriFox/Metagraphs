@@ -59,15 +59,16 @@ public class FreeCamera : MonoBehaviour {
 		if(!m_inputCaptured)
 			return;
 
-
 		var rotStrafe = Input.GetAxis("Mouse X");
 		var rotFwd = Input.GetAxis("Mouse Y");
 
+        // Вращение камеры
 		m_yaw = (m_yaw + mouseTurnSpeed * rotStrafe) % 360f;
 		m_pitch = (m_pitch - mouseTurnSpeed * rotFwd) % 360f;
 		transform.rotation = Quaternion.AngleAxis(m_yaw, Vector3.up) * Quaternion.AngleAxis(m_pitch, Vector3.right);
 
-		var speed = Time.deltaTime * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed);
+        // Перемещение камеры
+        var speed = Time.deltaTime * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed);
 		var forward = speed * Input.GetAxis("Vertical");
 		var right = speed * Input.GetAxis("Horizontal");
 		var up = speed * ((Input.GetKey(KeyCode.E) ? 1f : 0f) - (Input.GetKey(KeyCode.Q) ? 1f : 0f));
