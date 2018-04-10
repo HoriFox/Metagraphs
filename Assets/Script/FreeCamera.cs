@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 
 public class FreeCamera : MonoBehaviour {
-	//public bool enableInputCapture = true;
-	//public bool holdRightMouseCapture = false;
+    //public bool enableInputCapture = true;
+    //public bool holdRightMouseCapture = false;
 
-	public float mouseTurnSpeed = 5f;
+    public GameObject croshair;
+
+    public float mouseTurnSpeed = 5f;
 	public float moveSpeed = 5f;
 	public float sprintSpeed = 15f;
 
@@ -22,6 +24,7 @@ public class FreeCamera : MonoBehaviour {
 	//}
 
 	void CaptureInput() {
+        croshair.gameObject.SetActive(true);
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
@@ -32,6 +35,7 @@ public class FreeCamera : MonoBehaviour {
 	}
 
 	void ReleaseInput() {
+        croshair.gameObject.SetActive(false);
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 

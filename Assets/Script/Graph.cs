@@ -4,23 +4,38 @@ using UnityEngine;
 
 public class Graph : MonoBehaviour {
 
-    Renderer rend;
-    Color savedColode;
+    Vector3 position;
+    bool showInfoObject = false;
+
+    Vector3 screenPos;
+    public GUIStyle customButton;
 
     private void Start()
     {
-        rend = this.GetComponent<Renderer>();
-        savedColode = rend.material.color;
+        position = transform.position;
+    }
+
+    void OnGUI() {
+        if (showInfoObject)
+        {
+            GUI.Box(new Rect(screenPos.x + 1, screenPos.y + 1, 200, 50), "GRAPH \nName: " + name + "\nPosition: x: " + position.x.ToString()
+               + " y: " + position.y.ToString() + " z: " + position.z.ToString(), customButton);
+        }
     }
 
     private void OnMouseEnter()
     {
-        rend.material.color = new Color32((byte)(savedColode.r * 255), (byte)(savedColode.g * 255), (byte)(savedColode.b * 255), 255);
+        if (showInfoObject == false)
+        {
+            screenPos = Input.mousePosition;
+            screenPos.y = Screen.height - screenPos.y;
+            showInfoObject = true;
+        }
     }
 
     private void OnMouseExit()
     {
-        rend.material.color = savedColode;
+        showInfoObject = false;
     }
 
 }

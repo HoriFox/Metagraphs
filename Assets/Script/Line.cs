@@ -4,22 +4,31 @@ using UnityEngine;
 
 public class Line : MonoBehaviour {
 
-    Renderer rend;
-    Color savedColode;
+    bool showInfoObject = false;
 
-    private void Start()
+    Vector3 screenPos;
+    public GUIStyle customButton;
+
+    void OnGUI()
     {
-        rend = this.GetComponent<Renderer>();
-        savedColode = rend.material.color;
+        if (showInfoObject)
+        {
+            GUI.Box(new Rect(screenPos.x + 1, screenPos.y + 1, 200, 50), "LINK \nName: " + name + "\nConnects: in developing", customButton);
+        }
     }
 
     private void OnMouseEnter()
     {
-        rend.material.color = new Color32((byte)(savedColode.r * 255), (byte)(savedColode.g * 255), (byte)(savedColode.b * 255), 255);
+        if (showInfoObject == false)
+        {
+            screenPos = Input.mousePosition;
+            screenPos.y = Screen.height - screenPos.y;
+            showInfoObject = true;
+        }
     }
 
     private void OnMouseExit()
     {
-        rend.material.color = savedColode;
+        showInfoObject = false;
     }
 }
