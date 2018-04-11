@@ -285,10 +285,11 @@
     <Compile Include="Assets\Script\Engine.cs" />
     <Compile Include="Assets\Script\FreeCamera.cs" />
     <Compile Include="Assets\Script\Graph.cs" />
-    <Compile Include="Assets\Script\Line.cs" />
+    <Compile Include="Assets\Script\LGraph.cs" />
     <Compile Include="Assets\Script\MeshCombiner.cs" />
     <Compile Include="Assets\Script\ProgramScrips.cs" />
     <Compile Include="Assets\Script\Serialization.cs" />
+    <Compile Include="Assets\Script\SetObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Save\simple.txt" />
