@@ -11,19 +11,18 @@ public class FreeCamera : MonoBehaviour {
 	public float sprintSpeed = 15f;
 
 	bool	m_inputCaptured;
-	float	m_yaw;
-	float	m_pitch;
-	
-	//void Awake() {
-	//	enabled = enableInputCapture;
-	//}
+	float	m_yaw, m_pitch, rotStrafe, rotFwd, speed, forward, right, up;
 
-	//void OnValidate() {
-	//	if(Application.isPlaying)
-	//		enabled = enableInputCapture;
-	//}
+    //void Awake() {
+    //	enabled = enableInputCapture;
+    //}
 
-	void CaptureInput() {
+    //void OnValidate() {
+    //	if(Application.isPlaying)
+    //		enabled = enableInputCapture;
+    //}
+
+    void CaptureInput() {
         croshair.gameObject.SetActive(true);
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -63,8 +62,8 @@ public class FreeCamera : MonoBehaviour {
 		if(!m_inputCaptured)
 			return;
 
-		var rotStrafe = Input.GetAxis("Mouse X");
-		var rotFwd = Input.GetAxis("Mouse Y");
+		rotStrafe = Input.GetAxis("Mouse X");
+		rotFwd = Input.GetAxis("Mouse Y");
 
         // Вращение камеры
 		m_yaw = (m_yaw + mouseTurnSpeed * rotStrafe) % 360f;
@@ -72,10 +71,10 @@ public class FreeCamera : MonoBehaviour {
 		transform.rotation = Quaternion.AngleAxis(m_yaw, Vector3.up) * Quaternion.AngleAxis(m_pitch, Vector3.right);
 
         // Перемещение камеры
-        var speed = Time.deltaTime * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed);
-		var forward = speed * Input.GetAxis("Vertical");
-		var right = speed * Input.GetAxis("Horizontal");
-		var up = speed * ((Input.GetKey(KeyCode.E) ? 1f : 0f) - (Input.GetKey(KeyCode.Q) ? 1f : 0f));
+        float speed = Time.deltaTime * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed);
+        float forward = speed * Input.GetAxis("Vertical");
+        float right = speed * Input.GetAxis("Horizontal");
+        float up = speed * ((Input.GetKey(KeyCode.E) ? 1f : 0f) - (Input.GetKey(KeyCode.Q) ? 1f : 0f));
 		transform.position += transform.forward * forward + transform.right * right + Vector3.up * up;
 	}
 }
