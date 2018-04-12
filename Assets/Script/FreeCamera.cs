@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 
 public class FreeCamera : MonoBehaviour {
-    //public bool enableInputCapture = true;
-    //public bool holdRightMouseCapture = false;
 
     public GameObject croshair;
 
@@ -12,15 +10,6 @@ public class FreeCamera : MonoBehaviour {
 
 	bool	m_inputCaptured;
 	float	m_yaw, m_pitch, rotStrafe, rotFwd, speed, forward, right, up;
-
-    //void Awake() {
-    //	enabled = enableInputCapture;
-    //}
-
-    //void OnValidate() {
-    //	if(Application.isPlaying)
-    //		enabled = enableInputCapture;
-    //}
 
     void CaptureInput() {
         croshair.gameObject.SetActive(true);
@@ -71,10 +60,10 @@ public class FreeCamera : MonoBehaviour {
 		transform.rotation = Quaternion.AngleAxis(m_yaw, Vector3.up) * Quaternion.AngleAxis(m_pitch, Vector3.right);
 
         // Перемещение камеры
-        float speed = Time.deltaTime * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed);
-        float forward = speed * Input.GetAxis("Vertical");
-        float right = speed * Input.GetAxis("Horizontal");
-        float up = speed * ((Input.GetKey(KeyCode.E) ? 1f : 0f) - (Input.GetKey(KeyCode.Q) ? 1f : 0f));
+        speed = Time.deltaTime * (Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed);
+        forward = speed * Input.GetAxis("Vertical");
+        right = speed * Input.GetAxis("Horizontal");
+        up = speed * ((Input.GetKey(KeyCode.E) ? 1f : 0f) - (Input.GetKey(KeyCode.Q) ? 1f : 0f));
 		transform.position += transform.forward * forward + transform.right * right + Vector3.up * up;
 	}
 }

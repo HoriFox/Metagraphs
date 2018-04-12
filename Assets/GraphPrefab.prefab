@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33973683892860518}
   - component: {fileID: 135306745591127080}
   - component: {fileID: 23207760731120982}
-  - component: {fileID: 114453287324299668}
+  - component: {fileID: 114891085668771190}
   m_Layer: 0
   m_Name: GraphPrefab
   m_TagString: Untagged
@@ -84,7 +84,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1682843200641568}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114453287324299668
+--- !u!114 &114891085668771190
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -151,13 +151,13 @@ MonoBehaviour:
       m_Bottom: 0
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 0
-    m_FontStyle: 1
+    m_FontStyle: 0
     m_Alignment: 0
     m_WordWrap: 0
     m_RichText: 1
     m_TextClipping: 0
     m_ImagePosition: 0
-    m_ContentOffset: {x: 5, y: 2}
+    m_ContentOffset: {x: 2, y: 2}
     m_FixedWidth: 0
     m_FixedHeight: 0
     m_StretchWidth: 1

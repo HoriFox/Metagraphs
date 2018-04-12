@@ -284,15 +284,18 @@
   <ItemGroup>
     <Compile Include="Assets\Script\Engine.cs" />
     <Compile Include="Assets\Script\FreeCamera.cs" />
-    <Compile Include="Assets\Script\Graph.cs" />
-    <Compile Include="Assets\Script\LGraph.cs" />
-    <Compile Include="Assets\Script\MeshCombiner.cs" />
+    <Compile Include="Assets\Script\ObjectG.cs" />
     <Compile Include="Assets\Script\ProgramScrips.cs" />
     <Compile Include="Assets\Script\Serialization.cs" />
     <Compile Include="Assets\Script\SetObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Save\simple.txt" />
+    <None Include="Assets\Shader\Bad\Cool Hologram.shader" />
+    <None Include="Assets\Shader\Bad\Diffuse (Stipple Transparency).shader" />
+    <None Include="Assets\Shader\Bad\Transperent.shader" />
+    <None Include="Assets\Shader\Bad\TransperentV2.shader" />
+    <None Include="Assets\Shader\Diffuse ZWrite.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

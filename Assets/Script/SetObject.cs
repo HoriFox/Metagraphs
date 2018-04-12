@@ -10,6 +10,8 @@ public class SetObject : MonoBehaviour {
     [SerializeField]
     private Transform graphPrefab;
     [SerializeField]
+    private Transform spherePrefab;
+    [SerializeField]
     private Vector3 scaleLGraph = new Vector3(0.2f, 0.2f, 0.2f);
     [SerializeField]
     private Vector3 scaleLink = new Vector3(0.05f, 0.05f, 0.05f);
@@ -45,10 +47,10 @@ public class SetObject : MonoBehaviour {
             if (words[0] == "GRAPH")
             {
                 Vector3 pos = new Vector3(float.Parse(words[2]) + os_x, float.Parse(words[3]) + os_y, float.Parse(words[4]) + os_z);
-                Color32 color = new Color32(byte.Parse(words[5]), byte.Parse(words[6]), byte.Parse(words[7]), 255);
+                Color32 color = new Color32(byte.Parse(words[5]), byte.Parse(words[6]), byte.Parse(words[7]), 128);
                 arrayGraph[indexGraph] = Instantiate(graphPrefab, pos, Quaternion.identity);
                 arrayGraph[indexGraph].GetComponent<Renderer>().material.color = color;
-                arrayGraph[indexGraph].name = words[1];
+                arrayGraph[indexGraph].name = "[" + words[0] + "] " + words[1];
                 indexGraph++;
                 continue; //[!]
             }
@@ -56,9 +58,9 @@ public class SetObject : MonoBehaviour {
             {
                 Vector3 firstPos = new Vector3(float.Parse(words[2]) + os_x, float.Parse(words[3]) + os_y, float.Parse(words[4]) + os_z);
                 Vector3 secondPos = new Vector3(float.Parse(words[5]) + os_x, float.Parse(words[6]) + os_y, float.Parse(words[7]) + os_z);
-                Color32 color = new Color32(byte.Parse(words[8]), byte.Parse(words[9]), byte.Parse(words[10]), 255);
+                Color32 color = new Color32(byte.Parse(words[8]), byte.Parse(words[9]), byte.Parse(words[10]), 128);
                 arrayLine[indexLine] = CreateLine(true, firstPos, secondPos, color).GetComponent<Transform>();
-                arrayLine[indexLine].name = words[1];
+                arrayLine[indexLine].name = "[" + words[0] + "] " + words[1];
                 indexLine++;
                 continue; //[!]
             }
@@ -66,9 +68,9 @@ public class SetObject : MonoBehaviour {
             {
                 Vector3 firstPos = new Vector3(float.Parse(words[2]) + os_x, float.Parse(words[3]) + os_y, float.Parse(words[4]) + os_z);
                 Vector3 secondPos = new Vector3(float.Parse(words[5]) + os_x, float.Parse(words[6]) + os_y, float.Parse(words[7]) + os_z);
-                Color32 color = new Color32(0, 0, 0, 255);
+                Color32 color = new Color32(0, 0, 0, 128);
                 arrayLine[indexLine] = CreateLine(false, firstPos, secondPos, color).GetComponent<Transform>();
-                arrayLine[indexLine].name = words[1];
+                arrayLine[indexLine].name = "[" + words[0] + "] " + words[1];
                 indexLine++;
                 continue; //[!]
             }
@@ -86,8 +88,7 @@ public class SetObject : MonoBehaviour {
 
     private GameObject InitSphere(bool isLGraph, Vector3 point, Color32 color)
     {
-        sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.transform.position = point;
+        sphere = Instantiate<GameObject>(spherePrefab.gameObject, point, Quaternion.identity);
         sphere = SetProperties(isLGraph, sphere, color);
 
         return sphere;
