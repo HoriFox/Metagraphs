@@ -5,8 +5,7 @@ using System.IO;
 
 public class Engine : MonoBehaviour
 {
-    [SerializeField]
-    private SetObject setObject;
+    public SetObject setObject;
 
     void Start()
     {

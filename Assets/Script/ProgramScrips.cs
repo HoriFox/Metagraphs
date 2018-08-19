@@ -11,8 +11,10 @@ public class ProgramScrips : MonoBehaviour
 
     public static List<Serialization> savedGames = new List<Serialization>();
 
-    public void Save() // Экспорт (сохранение)
+    // Экспорт (сохранение).
+    public void Save()
     {
+        Debug.Log("Сохранение");
         savedGames.Add(Serialization.current);
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + "/saved.gd");
@@ -22,8 +24,10 @@ public class ProgramScrips : MonoBehaviour
 
     //C:\Users\Администратор\Documents\Metagraphs
 
-    public void Load() // Импорт (загрузка)
+    // Импорт (загрузка).
+    public void Load() 
     {
+        Debug.Log("Загрузка");
         if (File.Exists(Application.persistentDataPath + "/saved.gd"))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -33,12 +37,25 @@ public class ProgramScrips : MonoBehaviour
             //savedGames // Мучаем данную переменную и достаём данные
         }
     }
-
-    public void MakeScreenShot() // Сделать скриншот
+    // Назад.
+    public void Backward()
     {
+        Debug.Log("Назад");
+        //StartCoroutine("Capture");
+    }
+    // Вперёд.
+    public void Forward()
+    {
+        Debug.Log("Вперёд");
+        //StartCoroutine("Capture");
+    }
+    // Сделать скриншот.
+    public void MakeScreenShot()
+    {
+        Debug.Log("Скриншот");
         StartCoroutine("Capture");
     }
-
+    // Куратина скриншота.
     IEnumerator Capture()
     {
         screenCap = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
@@ -51,8 +68,20 @@ public class ProgramScrips : MonoBehaviour
         string timeAndData = System.DateTime.Now.ToString("hh-mm-ss MM-dd-yyyy");
         File.WriteAllBytes(Application.dataPath + "/Screenshot/" + timeAndData + ".png", bytes);
     }
-
-    public void Quit() // Выйти из приложения
+    // Показать информацию.
+    public void ShowInfo()
+    {
+        Debug.Log("Информация");
+        //StartCoroutine("Capture");
+    }
+    // Показать настройки.
+    public void ShowSetting()
+    {
+        Debug.Log("Настройки");
+        //StartCoroutine("Capture");
+    }
+    // Выйти из приложения.
+    public void Quit()
     {
         Application.Quit();
     }

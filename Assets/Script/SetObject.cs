@@ -5,24 +5,30 @@ using System;
 
 public class SetObject : MonoBehaviour {
 
-    [SerializeField]
-    private Transform linePrefab;
-    [SerializeField]
-    private Transform graphPrefab;
-    [SerializeField]
-    private Transform spherePrefab;
-    [SerializeField]
-    private Vector3 scaleLGraph = new Vector3(0.2f, 0.2f, 0.2f);
-    [SerializeField]
-    private Vector3 scaleLink = new Vector3(0.05f, 0.05f, 0.05f);
+    public Transform parent;
+    public Transform linePrefab;
+    public Transform graphPrefab;
+    public Transform spherePrefab;
+    public Vector3 scaleLGraph;
+    public Vector3 scaleLink;
 
     private GameObject sphere;
     private GameObject leftSphere;
     private GameObject rightSphere;
     private GameObject line;
 
-    private Transform[] arrayGraph = new Transform[200];
-    private Transform[] arrayLine = new Transform[50];
+    private Transform[] arrayGraph;
+    private Transform[] arrayLine;
+
+
+    public void Awake()
+    {
+        scaleLGraph = new Vector3(0.2f, 0.2f, 0.2f);
+        scaleLink = new Vector3(0.05f, 0.05f, 0.05f);
+
+        arrayGraph = new Transform[200];
+        arrayLine = new Transform[50];
+    }
 
     public void Create()
     {
@@ -36,19 +42,31 @@ public class SetObject : MonoBehaviour {
         while ((line = file.ReadLine()) != null)
         {
             String[] words = line.Split(new char[] { ',', '(', ')', '[', ']', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (words[0] == "#") continue;
+            if (words[0] == "#")
+            {
+                continue;
+            }
             if (words[0] == "OFFSET")
             {
-                if (words.Length > 1) os_x = float.Parse(words[1]);
-                if (words.Length > 2) os_y = float.Parse(words[2]);
-                if (words.Length > 3) os_z = float.Parse(words[3]);
+                if (words.Length > 1)
+                {
+                    os_x = float.Parse(words[1]);
+                }
+                if (words.Length > 2)
+                {
+                    os_y = float.Parse(words[2]);
+                }
+                if (words.Length > 3)
+                {
+                    os_z = float.Parse(words[3]);
+                }
                 continue; //[!]
             }
             if (words[0] == "GRAPH")
             {
                 Vector3 pos = new Vector3(float.Parse(words[2]) + os_x, float.Parse(words[3]) + os_y, float.Parse(words[4]) + os_z);
                 Color32 color = new Color32(byte.Parse(words[5]), byte.Parse(words[6]), byte.Parse(words[7]), 128);
-                arrayGraph[indexGraph] = Instantiate(graphPrefab, pos, Quaternion.identity);
+                arrayGraph[indexGraph] = Instantiate(graphPrefab, pos, Quaternion.identity, parent);
                 arrayGraph[indexGraph].GetComponent<Renderer>().material.color = color;
                 arrayGraph[indexGraph].name = "[" + words[0] + "] " + words[1];
                 indexGraph++;
@@ -88,7 +106,7 @@ public class SetObject : MonoBehaviour {
 
     private GameObject InitSphere(bool isLGraph, Vector3 point, Color32 color)
     {
-        sphere = Instantiate<GameObject>(spherePrefab.gameObject, point, Quaternion.identity);
+        sphere = Instantiate<GameObject>(spherePrefab.gameObject, point, Quaternion.identity, parent);
         sphere = SetProperties(isLGraph, sphere, color);
 
         return sphere;
@@ -96,7 +114,7 @@ public class SetObject : MonoBehaviour {
 
     private GameObject InitLine(bool isLGraph, Transform linePrefab, Vector3 beginPoint, Vector3 endPoint, Color32 color)
     {
-        line = Instantiate<GameObject>(linePrefab.gameObject, Vector3.zero, Quaternion.identity);
+        line = Instantiate<GameObject>(linePrefab.gameObject, Vector3.zero, Quaternion.identity, parent);
         line = SetProperties(isLGraph, line, color);
 
         UpdateLinePosition(line, beginPoint, endPoint);
@@ -106,10 +124,7 @@ public class SetObject : MonoBehaviour {
 
     private GameObject SetProperties(bool isLGraph, GameObject obj, Color32 color)
     {
-        if (isLGraph)
-            obj.transform.localScale = scaleLGraph;
-        else
-            obj.transform.localScale = scaleLink;
+        obj.transform.localScale = (isLGraph) ? scaleLGraph : scaleLink;
         obj.GetComponent<Renderer>().material.color = new Color32(color.r, color.g, color.b, color.a);
 
         return obj;

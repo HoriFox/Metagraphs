@@ -24,7 +24,9 @@ public class ObjectG : MonoBehaviour {
             if (names[0] == "LGRAPH" || names[0] == "LINK")
             {
                 GUI.Box(new Rect(screenPos.x + 1, screenPos.y + 1, 200, 50), names[0] + " \nName: " + names[1] + "\nConnects: in developing", customButton);
-            } else if (names[0] == "GRAPH")
+            }
+            else 
+            if (names[0] == "GRAPH")
             {
                 GUI.Box(new Rect(screenPos.x + 1, screenPos.y + 1, 200, 50), names[0] + " \nName: " + names[1] + "\nPosition: x: " + position.x.ToString()
                + " y: " + position.y.ToString() + " z: " + position.z.ToString(), customButton);
@@ -37,7 +39,7 @@ public class ObjectG : MonoBehaviour {
         if (showInfoObject == false)
         {
             screenPos = Input.mousePosition;
-            screenPos.y = Screen.height - screenPos.y;
+            screenPos.y = (float)Screen.height - screenPos.y;
             showInfoObject = true;
         }
     }
