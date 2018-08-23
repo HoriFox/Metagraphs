@@ -53,14 +53,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Script\EditorMenu.cs" />
      <Compile Include="Assets\Script\Engine.cs" />
      <Compile Include="Assets\Script\FreeCamera.cs" />
-     <Compile Include="Assets\Script\ObjectG.cs" />
+     <Compile Include="Assets\Script\LoadSaveDialog.cs" />
+     <Compile Include="Assets\Script\PredicateList.cs" />
      <Compile Include="Assets\Script\ProgramScrips.cs" />
-     <Compile Include="Assets\Script\PrologPredicate.cs" />
-     <Compile Include="Assets\Script\Serialization.cs" />
+     <Compile Include="Assets\Script\Reader.cs" />
      <Compile Include="Assets\Script\SetObject.cs" />
+     <Compile Include="Assets\Script\Tooltip\Tooltip.cs" />
+     <Compile Include="Assets\Script\Tooltip\TooltipText.cs" />
+     <Compile Include="Assets\Script\Tooltip\TooltipTextUI.cs" />
      <None Include="Assets\Shader\Diffuse ZWrite.shader" />
+     <None Include="Assets\EditorSettings.xml" />
      <None Include="Assets\Shader\Bad\Cool Hologram.shader" />
      <None Include="Assets\Save\simple.txt" />
      <None Include="Assets\Shader\Bad\Transperent.shader" />
@@ -266,6 +271,9 @@
  </Reference>
  <Reference Include="UnityEngine.SpatialTracking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Windows.Forms">
+ <HintPath>C:/Users/HeliSRaiN/Desktop/Бесконечное лето/Представление метаграфов/Metagraphs/Assets/Plugins/System.Windows.Forms.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Analytics">
  <HintPath>C:/Users/HeliSRaiN/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>

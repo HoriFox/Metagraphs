@@ -1,0 +1,7 @@
+Vertex(Name=v1,Attribute(Name=количество, Type=int, Value=5),Attribute(Name=ссылка, Type=link, Value=mv2))
+
+
+
+
+
+

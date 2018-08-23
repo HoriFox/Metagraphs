@@ -1,14 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.IO;
+﻿using UnityEngine;
 
-public class Engine : MonoBehaviour
+namespace nm
 {
-    public SetObject setObject;
-
-    void Start()
+    public class Engine : MonoBehaviour
     {
-        setObject.Create();
+        public bool CustomCursor;
+        public Texture2D cursorTexture;
+        public SetObject setObject;
+        public GameObject boxtooltip;
+
+        void Awake()
+        {
+            if (CustomCursor)
+            {
+                Cursor.SetCursor(cursorTexture, new Vector2(14, 14), CursorMode.Auto);
+            }
+            boxtooltip.SetActive(true);
+        }
+
+        void Start()
+        {
+            setObject.Create();
+        }
     }
 }

@@ -1,0 +1,7 @@
+Metavertex(Name=mv2, v1, v2, v3,Edge(Name = e1, v1, v2),Edge(Name = e2, v2, v3),Edge(Name = e3, v1, v3))
+
+
+
+
+
+

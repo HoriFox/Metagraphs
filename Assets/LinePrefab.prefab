@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 23595343411738136}
   - component: {fileID: 33421176524721784}
   - component: {fileID: 64042141151085514}
-  - component: {fileID: 114485078302051366}
+  - component: {fileID: 114262161777073796}
   m_Layer: 0
   m_Name: LinePrefab
   m_TagString: Untagged
@@ -56,6 +56,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 2100000, guid: d0431c344fdb24c4d87a584758d94683, type: 2}
   m_StaticBatchInfo:
@@ -83,7 +84,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1208059484703980}
-  m_Mesh: {fileID: 4300000, guid: 27d08fc871d2b3c47a1d5d21069cb61c, type: 2}
+  m_Mesh: {fileID: 4300000, guid: eba6a13b14434df4a8f4876f9e8fe012, type: 2}
 --- !u!64 &64042141151085514
 MeshCollider:
   m_ObjectHideFlags: 1
@@ -97,8 +98,8 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_SkinWidth: 0.01
-  m_Mesh: {fileID: 4300000, guid: 27d08fc871d2b3c47a1d5d21069cb61c, type: 2}
---- !u!114 &114485078302051366
+  m_Mesh: {fileID: 4300000, guid: eba6a13b14434df4a8f4876f9e8fe012, type: 2}
+--- !u!114 &114262161777073796
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -106,73 +107,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 1208059484703980}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a19c4595315b4e842a436299dcd6fd3c, type: 3}
+  m_Script: {fileID: 11500000, guid: d5cf829505a714a4bac421e069d6174b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  customButton:
-    m_Name: 
-    m_Normal:
-      m_Background: {fileID: 10305, guid: 0000000000000000f000000000000000, type: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Hover:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Active:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Focused:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnNormal:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnHover:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnActive:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnFocused:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Border:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Margin:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Padding:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Overflow:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 0
-    m_FontStyle: 0
-    m_Alignment: 0
-    m_WordWrap: 0
-    m_RichText: 1
-    m_TextClipping: 0
-    m_ImagePosition: 0
-    m_ContentOffset: {x: 2, y: 2}
-    m_FixedWidth: 0
-    m_FixedHeight: 0
-    m_StretchWidth: 1
-    m_StretchHeight: 0
+  text: 
+  arrayShow: 1
