@@ -19,6 +19,7 @@ namespace nm
         public string saveFileName = "EditorSettings";
         public GameObject[] allUI;
         public GameObject startMenu;
+        public GameObject aboutMenu;
         public GameObject errorMenu;
         public KeyCode[] defaultKeys = { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.E, KeyCode.Q, KeyCode.LeftShift };
         public Scrollbar SensitivityScrollbar;
@@ -27,7 +28,7 @@ namespace nm
         public GameObject keyMenu;
         public GameObject keyInfo;
         public Button applyButton;
-        public Toggle screenMade;
+        public Toggle screenMode;
         public Text resolutionsText;
         public Text qualityText;
 
@@ -39,11 +40,11 @@ namespace nm
         private int resolutions_id;
         private int quality_id;
 
-        FreeCamera fc;
+        GameObject fc;
 
         void Awake()
         {
-            fc = GameObject.Find("Camera").GetComponent<FreeCamera>();
+            fc = GameObject.Find("Camera");
         }
 
         void Start()
@@ -204,7 +205,7 @@ namespace nm
         {
             qualityText.text = qualityList[quality_id];
             resolutionsText.text = resolutionsList[resolutions_id].width + "x" + resolutionsList[resolutions_id].height;
-            screenMade.isOn = isFullScreen;
+            screenMode.isOn = isFullScreen;
             SensitivityScrollbar.value = mouseSensitivity;
             SmoothingScrollbar.value = smoothingMotion;
             applyButton.interactable = false;
@@ -315,11 +316,20 @@ namespace nm
         public void ResetMenuActive()
         {
             menuActive = false;
-            fc.UpdateMouseSetting();
+            fc.GetComponent<FreeCamera>().UpdateMouseSetting();
+            fc.GetComponent<SuperBlur>().enabled = false;
+        }
+
+        public void ShowAbout()
+        {
+            fc.GetComponent<SuperBlur>().enabled = true;
+            aboutMenu.SetActive(true);
+            menuActive = true;
         }
 
         public void Show()
         {
+            fc.GetComponent<SuperBlur>().enabled = true;
             startMenu.SetActive(true);
             menuActive = true;
         }

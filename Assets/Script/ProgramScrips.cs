@@ -59,9 +59,12 @@ namespace nm
             File.WriteAllBytes(Application.dataPath + "/Screenshot/" + timeAndData + ".png", bytes);
         }
         // Показать настройки.
-        public void ShowInfo()
+        public void ShowAbout()
         {
-            em.menuActive = true;
+            if (!em.menuActive && !fc.m_inputCaptured)
+            {
+                em.ShowAbout();
+            }
         }
         // Показать настройки.
         public void ShowSetting()

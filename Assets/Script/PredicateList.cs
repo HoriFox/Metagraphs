@@ -42,6 +42,8 @@ namespace nm
         /// </summary>
         public class Vertex : Predicate
         {
+            string output;
+            Transform objectTransform;
             // Название объекта.
             public override string Name { get; set; }
             // Признак Мета принадлежности.
@@ -54,25 +56,30 @@ namespace nm
                 MetaType = metatype;
                 Predicates = predicates;
                 Name = name;
-
                 Create();
                 OutLog();
             }
             public void Create()
             {
+                objectTransform = InitObject.Instance.InitGraph(new Vector3(Random.Range(-1.18f, 1.18f), Random.Range(-1f, 1f), 1.88f), 
+                    new Color32(0, 0, 0, 128), Name);
             }
             public override void OutLog()
             {
                 string NameObject = (MetaType == false) ? "Vertex" : "Metavertex";
-                Debug.Log("<b>" + NameObject + " |</b> Name: " + Name  + " | HasChild: " 
-                    + ((Predicates != null) ? "True" : "False"));
+                string output = "<b>" + NameObject + " |</b> Name: " + Name + " | HasChild: "
+                    + ((Predicates != null) ? "True" : "False");
+                Debug.Log(output);
                 if (Predicates != null && Predicates.Count != 0)
                 {
+                    output += "\nChildren:";
                     foreach (var Predicate in Predicates)
                     {
                         Debug.Log("\t └> " + Predicate.Value.Name);
+                        output += "\n" + Predicate.Value.Name;
                     }
                 }
+                objectTransform.GetComponentInParent<TooltipText>().text = output;
             }
         }
 
@@ -84,6 +91,8 @@ namespace nm
         /// </summary>
         public class Edge : Predicate
         {
+            string output;
+            Transform objectTransform;
             // Название объекта.
             public override string Name { get; set; }
             // Стартовая вершина.
@@ -107,10 +116,11 @@ namespace nm
                 Name = name;
 
                 Create();
-                OutLog();
+                //OutLog();
             }
             public void Create()
             {
+
             }
             public override void OutLog()
             {
@@ -160,6 +170,8 @@ namespace nm
         /// </summary>
         public class Graph : Predicate
         {
+            string output;
+            Transform objectTransform;
             // Название объекта.
             public override string Name { get; set; }
             // Признак Мета принадлежности.
@@ -174,10 +186,11 @@ namespace nm
                 Name = name;
 
                 Create();
-                OutLog();
+                //OutLog();
             }
             public void Create()
             {
+
             }
             public override void OutLog()
             {

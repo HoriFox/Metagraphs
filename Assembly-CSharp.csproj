@@ -53,14 +53,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Script\DebugSctipts\FPSDisplay.cs" />
      <Compile Include="Assets\Script\EditorMenu.cs" />
      <Compile Include="Assets\Script\Engine.cs" />
      <Compile Include="Assets\Script\FreeCamera.cs" />
+     <Compile Include="Assets\Script\InitObject.cs" />
      <Compile Include="Assets\Script\LoadSaveDialog.cs" />
      <Compile Include="Assets\Script\PredicateList.cs" />
      <Compile Include="Assets\Script\ProgramScrips.cs" />
      <Compile Include="Assets\Script\Reader.cs" />
-     <Compile Include="Assets\Script\SetObject.cs" />
+     <Compile Include="Assets\Script\SuperBlur\SuperBlur.cs" />
+     <Compile Include="Assets\Script\SuperBlur\SuperBlurBase.cs" />
      <Compile Include="Assets\Script\Tooltip\Tooltip.cs" />
      <Compile Include="Assets\Script\Tooltip\TooltipText.cs" />
      <Compile Include="Assets\Script\Tooltip\TooltipTextUI.cs" />
@@ -68,9 +71,12 @@
      <None Include="Assets\EditorSettings.xml" />
      <None Include="Assets\Shader\Bad\Cool Hologram.shader" />
      <None Include="Assets\Save\simple.txt" />
+     <None Include="Assets\Shader\SuperBlurUI.shader" />
      <None Include="Assets\Shader\Bad\Transperent.shader" />
+     <None Include="Assets\Save\simpleNull.txt" />
      <None Include="Assets\Shader\Bad\TransperentV2.shader" />
      <None Include="Assets\Shader\Bad\Diffuse (Stipple Transparency).shader" />
+     <None Include="Assets\Shader\SuperBlurPostEffect.shader" />
  <Reference Include="UnityEditor.StandardEvents">
  <HintPath>C:/Users/HeliSRaiN/Desktop/Бесконечное лето/Представление метаграфов/Metagraphs/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
  </Reference>

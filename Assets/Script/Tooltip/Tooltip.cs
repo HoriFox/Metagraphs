@@ -27,7 +27,7 @@ namespace nm
         public Text boxText;
         public Camera _camera;
 
-
+        private int borderAround;
         private Image[] img;
         private Color BGColorFade;
         private Color textColorFade;
@@ -38,6 +38,7 @@ namespace nm
 
         void Awake()
         {
+            borderAround = border * 2;
             arrowRT = arrow.GetComponent<RectTransform>();
             img = new Image[2];
             img[0] = box.GetComponent<Image>();
@@ -53,7 +54,10 @@ namespace nm
                 bg.color = BGColorFade;
             }
             boxText.color = textColorFade;
-            boxText.alignment = TextAnchor.MiddleCenter;
+            // Добавляем левый бардюр.
+            boxText.rectTransform.position += new Vector3(border, 0f, 0f);
+            // Установка Align. Отношения.
+            //boxText.alignment = TextAnchor.MiddleCenter;
             fc = GameObject.Find("Camera").GetComponent<FreeCamera>();
             em = GameObject.Find("Menu").GetComponent<EditorMenu>();
         }
@@ -80,10 +84,10 @@ namespace nm
             arrow.SetActive(arrayShow);
             float width = maxWidth;
             // Если ширина текста соотвествует максимальной ширине.
-            if (boxText.preferredWidth <= maxWidth - border) width = boxText.preferredWidth + border;
+            if (boxText.preferredWidth <= maxWidth - borderAround) width = boxText.preferredWidth + borderAround;
             // Если финальная ширина меньше минимальной ширины.
             if (width < minWidth) width = minWidth;
-            box.sizeDelta = new Vector2(width, boxText.preferredHeight + border);
+            box.sizeDelta = new Vector2(width, boxText.preferredHeight + borderAround);
             // Cдвиг позиции стрелки по Х.
             float arrowShift = width / 4;
 

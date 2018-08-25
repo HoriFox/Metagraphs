@@ -6,7 +6,7 @@ namespace nm
     {
         public bool CustomCursor;
         public Texture2D cursorTexture;
-        public SetObject setObject;
+        public InitObject initObject;
         public GameObject boxtooltip;
 
         void Awake()
@@ -20,7 +20,19 @@ namespace nm
 
         void Start()
         {
-            setObject.Create();
+            initObject.Create();
         }
     }
+    //public static T GetSafeComponent<T>(this GameObject obj) where T : MonoBehaviour
+    //{
+    //    T component = obj.GetComponent<T>();
+
+    //    if (component == null)
+    //    {
+    //        Debug.LogError("Expected to find component of type "
+    //           + typeof(T) + " but found none", obj);
+    //    }
+
+    //    return component;
+    //}
 }
