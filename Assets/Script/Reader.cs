@@ -8,9 +8,23 @@ namespace nm
 {
     public class Reader : MonoBehaviour
     {
+        bool lastLoadCompleted = true;
         public Dictionary<string, PredicateList.Predicate> predicate = null;
+        [HideInInspector]
+        public string reservedContent = null;
+
+        public void ReloadCode()
+        {
+            if (reservedContent != null && lastLoadCompleted)
+            {
+                ReadCode(reservedContent);
+            }
+        }
         public void ReadCode(string content)
         {
+            lastLoadCompleted = false;
+            reservedContent = content;
+            SceneCleaning.Instance.Clean();
             predicate = new Dictionary<string, PredicateList.Predicate>();
             string input = content.Replace(" ", string.Empty);
             //Debug.Log(input);
@@ -18,7 +32,33 @@ namespace nm
             string pattern = "(" + String.Join("|", delimiters.Select(d => Regex.Escape(d)).ToArray()) + ")";
             string[] result = Regex.Split(input, pattern);
 
-            ReadNowSector(result, 0, result[0]);
+            ReadAllSctor(result);
+        }
+
+        public void ReadAllSctor(string[] result)
+        {
+            KeyValuePair<PredicateList.Predicate, int> resultCall;
+            int nowSector = 0;
+
+            while (nowSector != result.Length)
+            {
+                switch (result[nowSector])
+                {
+                    case "Vertex":
+                    case "Metavertex":
+                    case "Edge":
+                    case "Metaedge":
+                    case "Metagraph":
+                    case "Attribute":
+                        break;
+                    default:
+                        nowSector++;
+                        continue;
+                }
+                resultCall = ReadNowSector(result, nowSector, result[nowSector]);
+                nowSector = resultCall.Value;
+            }
+            lastLoadCompleted = true;
         }
 
         public KeyValuePair<PredicateList.Predicate, int> ReadNowSector(string[] array, int nowSector, string predicateType)
@@ -43,6 +83,10 @@ namespace nm
             while (nowSector != array.Length)
             {
                 nowSector++;
+                //Debug.Log("3. nowSector: " + nowSector);
+
+                if (((nowSector) >= array.Length)) return new KeyValuePair<PredicateList.Predicate, int>(null, array.Length);
+
                 // Если мы нашли тип данных вида "name=value".
                 if (array[nowSector].Contains("="))
                 {
@@ -65,14 +109,14 @@ namespace nm
                             edgeDirection = bool.Parse(key);
                             break;
                         case "vS":
-                            if (predicate.ContainsKey(key) == false)
+                            if (!predicate.ContainsKey(key))
                             {
                                 predicate[key] = new PredicateList.Vertex(key);
                             }
                             bondsDict["start"] = (PredicateList.Vertex)predicate[key];
                             break;
                         case "vE":
-                            if (predicate.ContainsKey(key) == false)
+                            if (!predicate.ContainsKey(key))
                             {
                                 predicate[key] = new PredicateList.Vertex(key);
                             }
@@ -144,21 +188,22 @@ namespace nm
                     currentPredicate = new PredicateList.Vertex(predicateName, predicateChild);
                     break;
                 case "Metavertex":
-                    currentPredicate = new PredicateList.Vertex(predicateName, predicateChild, metatype: true);
+                    currentPredicate = new PredicateList.Vertex(predicateName, predicateChild, true);
                     break;
                 case "Edge":
                     currentPredicate = new PredicateList.Edge(predicateName, bondsDict, predicateChild, edgeDirection);
                     break;
                 case "Metaedge":
-                    currentPredicate = new PredicateList.Edge(predicateName, bondsDict, predicateChild, edgeDirection, metatype: true);
+                    currentPredicate = new PredicateList.Edge(predicateName, bondsDict, predicateChild, edgeDirection, true);
                     break;
                 case "Metagraph":
-                    currentPredicate = new PredicateList.Graph(predicateName, predicateChild, metatype: true);
+                    currentPredicate = new PredicateList.Graph(predicateName, predicateChild, true);
                     break;
                 case "Attribute":
                     currentPredicate = new PredicateList.Attribute(predicateName, predicateValueType, predicateValue);
                     break;
             }
+            //Debug.Log("4. nowSector: " + nowSector);
             predicate[predicateName] = currentPredicate;
             return new KeyValuePair<PredicateList.Predicate, int>(currentPredicate, nowSector + 1);
         }

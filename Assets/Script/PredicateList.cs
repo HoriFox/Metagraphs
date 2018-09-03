@@ -31,6 +31,9 @@ namespace nm
         // Все элементы описания.
         public class Predicate
         {
+            public virtual Vector3 FixingPoint { get; set; }
+            //public virtual Transform ObjectTransform { get; set; }
+            public virtual Dictionary<int, Transform> ObjectsTransform { get; set; }
             public virtual string Name { get; set; }
             public virtual void OutLog() { }
         }
@@ -42,8 +45,9 @@ namespace nm
         /// </summary>
         public class Vertex : Predicate
         {
-            string output;
-            Transform objectTransform;
+            public override Vector3 FixingPoint { get; set; }
+            //public override Transform ObjectTransform { get; set; }
+            public override Dictionary<int, Transform> ObjectsTransform { get; set; }
             // Название объекта.
             public override string Name { get; set; }
             // Признак Мета принадлежности.
@@ -53,6 +57,7 @@ namespace nm
 
             public Vertex(string name, Dictionary<string, Predicate> predicates = null, bool metatype = false)
             {
+                ObjectsTransform = new Dictionary<int, Transform>();
                 MetaType = metatype;
                 Predicates = predicates;
                 Name = name;
@@ -61,14 +66,35 @@ namespace nm
             }
             public void Create()
             {
-                objectTransform = InitObject.Instance.InitGraph(new Vector3(Random.Range(-1.18f, 1.18f), Random.Range(-1f, 1f), 1.88f), 
-                    new Color32(0, 0, 0, 128), Name);
+                // Позиция центра вершины-связи и сферы.
+                FixingPoint = new Vector3(Random.Range(-1.18f, 1.18f), Random.Range(-1f, 1f), Random.Range(0f, 4f)); // TO DO [ИЗ ЛОГИКИ]
+                if (Predicates != null && Predicates.Count >= 1)
+                {
+                    // Вершина-связь.
+                    Vector3 positionChild = new Vector3();
+                    Color32 color = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 128);
+
+                    int n = 0;
+                    foreach (var Predicate in Predicates)
+                    {
+                        // Не делаем связь с Edge и MetaEdge
+                        if (Predicate.Value is Edge) continue;
+                        positionChild = Predicate.Value.FixingPoint;
+                        ObjectsTransform[n] = InitObject.Instance.InitLine(true, FixingPoint, positionChild, color, Name);
+                        n++;
+                    }
+                }
+                else
+                {
+                    // Вершина-сфера.
+                    ObjectsTransform[0] = InitObject.Instance.InitGraph(FixingPoint, new Color32(0, 0, 0, 128), Name);
+                }
             }
             public override void OutLog()
             {
                 string NameObject = (MetaType == false) ? "Vertex" : "Metavertex";
                 string output = "<b>" + NameObject + " |</b> Name: " + Name + " | HasChild: "
-                    + ((Predicates != null) ? "True" : "False");
+                    + ((Predicates != null && Predicates.Count != 0) ? "True" : "False");
                 Debug.Log(output);
                 if (Predicates != null && Predicates.Count != 0)
                 {
@@ -79,7 +105,17 @@ namespace nm
                         output += "\n" + Predicate.Value.Name;
                     }
                 }
-                objectTransform.GetComponentInParent<TooltipText>().text = output;
+                if (ObjectsTransform.Count != 0)
+                {
+                    foreach (var ot in ObjectsTransform)
+                    {
+                        ot.Value.GetComponentInParent<TooltipText>().text = output;
+                    }
+                }
+                else
+                {
+                    ObjectsTransform[0].GetComponentInParent<TooltipText>().text = output;
+                }
             }
         }
 
@@ -91,8 +127,8 @@ namespace nm
         /// </summary>
         public class Edge : Predicate
         {
-            string output;
-            Transform objectTransform;
+            //public override Transform ObjectTransform { get; set; }
+            public override Dictionary<int, Transform> ObjectsTransform { get; set; }
             // Название объекта.
             public override string Name { get; set; }
             // Стартовая вершина.
@@ -103,24 +139,64 @@ namespace nm
             public bool MetaType;
             // Признак направленности ребра.
             public bool EdgeDirection;
+            Dictionary<string, Vertex> Bonds;
             // Подчинённые предикаты.
             public Dictionary<string, Predicate> Predicates;
 
             public Edge(string name, Dictionary<string, Vertex> bonds, Dictionary<string, Predicate> predicates = null, bool eo = false, bool metatype = false)
             {
+                ObjectsTransform = new Dictionary<int, Transform>();
                 MetaType = metatype;
                 if (bonds.ContainsKey("start") == true) StartVertex = bonds["start"];
                 if (bonds.ContainsKey("end") == true) EndVertex = bonds["end"];
                 EdgeDirection = eo;
                 Predicates = predicates;
+                Bonds = bonds;
                 Name = name;
 
                 Create();
-                //OutLog();
+                OutLog();
             }
             public void Create()
             {
+                Vector3 positionFirst = new Vector3();
+                Vector3 positionSecond = new Vector3();
+                Color32 color = new Color32(74, 161, 112, 128);
 
+                if (Bonds.Count != 0)
+                {
+                    positionFirst = StartVertex.ObjectsTransform[0].position;
+                    positionSecond = EndVertex.ObjectsTransform[0].position;
+
+                    Debug.Log("Попытались соединить направленный");
+                }
+                else if (Predicates.Count > 2)
+                {
+                    positionFirst = StartVertex.ObjectsTransform[0].position;
+                    positionSecond = new Vector3(Random.Range(-1.18f, 1.18f), Random.Range(-1f, 1f), Random.Range(0f, 4f)); // TO DO [ИЗ ЛОГИКИ]
+
+                    Debug.Log("Попытались соединить несколько детей");
+                }
+                else if (Predicates.Count == 2)
+                {
+                    int k = 0;
+                    foreach (var Predicate in Predicates)
+                    {
+                        if (k == 0)
+                        {
+                            positionFirst = Predicate.Value.ObjectsTransform[0].position;
+                        }
+                        if (k == 1)
+                        {
+                            positionSecond = Predicate.Value.ObjectsTransform[0].position;
+                        }
+                        k++;
+                    }
+
+                    Debug.Log("Соединили две простых вершины");
+                }
+
+                ObjectsTransform[0] = InitObject.Instance.InitLine(false, positionFirst, positionSecond, color, Name);
             }
             public override void OutLog()
             {
@@ -152,15 +228,19 @@ namespace nm
                     }
                 }
                 string NameObject = (MetaType == false) ? "Edge" : "Metaedge";
-                Debug.Log("<b>" + NameObject + " |</b> Name: " + Name + " | EdgeDirection: " + EdgeDirection 
-                    + " | HasChild: " + ((Predicates.Count != 0) ? "True" : "False") + " | <b>" + Chain + "</b>");
+                string output = "<b>" + NameObject + " |</b> Name: " + Name + " | EdgeDirection: " + EdgeDirection
+                    + " | HasChild: " + ((Predicates.Count != 0) ? "True" : "False") + " | <b>" + Chain + "</b>";
+                Debug.Log(output);
                 if (Predicates != null && Predicates.Count != 0)
                 {
+                    output += "\nChildren:";
                     foreach (var Predicate in Predicates)
                     {
                         Debug.Log("\t └> " + Predicate.Value.Name);
+                        output += "\n" + Predicate.Value.Name;
                     }
                 }
+                ObjectsTransform[0].GetComponentInParent<TooltipText>().text = output;
             }
         }
 
@@ -170,8 +250,10 @@ namespace nm
         /// </summary>
         public class Graph : Predicate
         {
-            string output;
-            Transform objectTransform;
+            public override Vector3 FixingPoint { get; set; }
+            //public override Transform ObjectTransform { get; set; }
+            public override Dictionary<int, Transform> ObjectsTransform { get; set; }
+            //public override Transform[] ObjectsTransform { get; set; }
             // Название объекта.
             public override string Name { get; set; }
             // Признак Мета принадлежности.
@@ -180,30 +262,55 @@ namespace nm
             public Dictionary<string, Predicate> Predicates;
 
             public Graph(string name, Dictionary<string, Predicate> predicates = null, bool metatype = true)
-            {
+            {ObjectsTransform = new Dictionary<int, Transform>();
                 MetaType = metatype;
                 Predicates = predicates;
                 Name = name;
-
                 Create();
-                //OutLog();
+                OutLog();
             }
             public void Create()
             {
+                // Позиция центра вершины-связи и сферы.
+                FixingPoint = new Vector3(Random.Range(-1.18f, 1.18f), Random.Range(-1f, 1f), Random.Range(0f, 4f)); // TO DO [ИЗ ЛОГИКИ]
+                if (Predicates != null && Predicates.Count >= 1)
+                {
+                    // Вершина-связь.
+                    Vector3 positionChild = new Vector3();
+                    Color32 color = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 128);
 
+                    int n = 0;
+                    foreach (var Predicate in Predicates)
+                    {
+                        // Не делаем связь с Edge и MetaEdge
+                        if (Predicate.Value is Edge) continue;
+                        positionChild = Predicate.Value.FixingPoint;
+                        ObjectsTransform[n] = InitObject.Instance.InitLine(true, FixingPoint, positionChild, color, Name);
+                        n++;
+                    }
+                }
+                else
+                {
+                    // Вершина-сфера.
+                    ObjectsTransform[0] = InitObject.Instance.InitGraph(FixingPoint, new Color32(0, 0, 0, 128), Name);
+                }
             }
             public override void OutLog()
             {
                 string NameObject = (MetaType == false) ? "Graph" : "Metagraph";
-                Debug.Log("<b>" + NameObject + " |</b> Name: " + Name  
-                    + " | HasChild: " + ((Predicates != null) ? "True" : "False"));
+                string output = "<b>" + NameObject + " |</b> Name: " + Name
+                    + " | HasChild: " + ((Predicates != null) ? "True" : "False");
+                Debug.Log(output);
                 if (Predicates != null && Predicates.Count != 0)
                 {
+                    output += "\nChildren:";
                     foreach (var Predicate in Predicates)
                     {
                         Debug.Log("\t └> " + Predicate.Value.Name);
+                        output += "\n" + Predicate.Value.Name;
                     }
                 }
+                ObjectsTransform[0].GetComponentInParent<TooltipText>().text = output;
             }
         }
 
@@ -229,9 +336,10 @@ namespace nm
                 //Reader.predicate[]
                 OutLog();
             }
-
             public override void OutLog()
             {
+                string output = "<b>Attribute |</b> Name: " + Name;
+                Debug.Log(output);
                 //if (ValueType == "int") Debug.Log("<b>Attribute |</b> Name: " + Name + " | " + ValueType + ": " + Value);
                 //if (ValueType == "link") Debug.Log("<b>Attribute |</b> Name: " + Name + " | " + ValueType + ": " + (Predicate)Value);
             }

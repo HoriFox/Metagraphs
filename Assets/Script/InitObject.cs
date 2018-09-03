@@ -12,15 +12,17 @@ namespace nm
         private void Start()
         {
             Instance = this;
+            parentSimple = new GameObject("TestSimple").transform;
         }
 
-        public Transform parent;
+        public Transform parentStandart;
         public Transform linePrefab;
         public Transform graphPrefab;
         public Transform spherePrefab;
         public Vector3 scaleLGraph = new Vector3(0.2f, 0.2f, 0.2f);
         public Vector3 scaleLink = new Vector3(0.05f, 0.05f, 0.05f);
-        //private Dictionary<string, Transform> arrayObject = new Dictionary<string, Transform>();
+
+        Transform parentSimple;
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // БОЛЬШАЯ ЧАСТЬ ЭТОГО КОДА ПОЙДЁТ В МУСОРКУ. ОСТАВИМ ТОЛЬКО ИНИЦИАЛИЗАЦИИ ДЛЯ КЛАССОВ.
@@ -35,71 +37,62 @@ namespace nm
                 if (words[0] == "#") continue;
                 if (words[0] == "GRAPH")
                 {
-                    InitGraph(new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])), 
-                        new Color32(byte.Parse(words[5]), byte.Parse(words[6]), byte.Parse(words[7]), 128), words[1]);
+                    Transform tr = InitGraph(new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
+                        new Color32(byte.Parse(words[5]), byte.Parse(words[6]), byte.Parse(words[7]), 128), words[1], parentSimple);
+                    //tr.GetComponentInParent<TooltipText>().active = false;
                 }
                 if (words[0] == "LGRAPH")
                 {
-                    InitLGraph(new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
+                    Transform tr = InitLine(true, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
                         new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
-                        new Color32(byte.Parse(words[8]), byte.Parse(words[9]), byte.Parse(words[10]), 128), words[1]);
+                        new Color32(byte.Parse(words[8]), byte.Parse(words[9]), byte.Parse(words[10]), 128), words[1], parentSimple);
+                    //tr.GetComponentInParent<TooltipText>().active = false;
                 }
                 if (words[0] == "LINK")
                 {
-                    InitLink(new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
+                    Transform tr = InitLine(false, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
                         new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
-                        new Color32(0, 0, 0, 128), words[1]);
+                        new Color32(0, 0, 0, 128), words[1], parentSimple);
+                    //tr.GetComponentInParent<TooltipText>().active = false;
                 }
             }
             file.Close();
         }
 
-        public Transform InitGraph(Vector3 position, Color32 color, string name)
+        public Transform InitGraph(Vector3 position, Color32 color, string name, Transform parent = null)
         {
             Transform objectVar;
-            string nameObject = PredicateList.NameSystem.GetName("GRAPH");
-            objectVar = Instantiate(graphPrefab, position, Quaternion.identity, parent);
+            Transform parentUse = parent ?? parentStandart;
+            objectVar = Instantiate(graphPrefab, position, Quaternion.identity, parentUse);
             objectVar.GetComponent<Renderer>().material.color = color;
             objectVar.name = "[GRAPH] " + name;
-            objectVar.GetComponentInParent<TooltipText>().text = nameObject;
+            objectVar.GetComponentInParent<TooltipText>().text = name;
             return objectVar;
         }
 
-        public Transform InitLGraph(Vector3 positionFirst, Vector3 positionSecond, Color32 color, string name)
+        public Transform InitLine(bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, Color32 color, string name, Transform parent = null)
         {
             Transform objectVar;
-            string nameObject = PredicateList.NameSystem.GetName("LGRAPH");
-            objectVar = CreateLine(true, positionFirst, positionSecond, color).GetComponent<Transform>();
-            //objectVar.GetComponent<Renderer>().material.color = color;
-            objectVar.name = "[LGRAPH] " + name;
-            objectVar.GetComponentInParent<TooltipText>().text = nameObject;
+            Transform parentUse = parent ?? parentStandart;
+            objectVar = CreateLine(isLGraph, positionFirst, positionSecond, color, parentUse).GetComponent<Transform>();
+            objectVar.name = (isLGraph) ? "[LGRAPH] " + name : "[LINK] " + name;
+            objectVar.GetComponentInParent<TooltipText>().text = name;
             return objectVar;
         }
 
-        public Transform InitLink(Vector3 positionFirst, Vector3 positionSecond, Color32 color, string name)
+        private GameObject CreateLine(bool isLGraph, Vector3 firstPoint, Vector3 secondPoint, Color32 color, Transform parent)
         {
-            Transform objectVar;
-            string nameObject = PredicateList.NameSystem.GetName("LINK");
-            objectVar = CreateLine(true, positionFirst, positionSecond, color).GetComponent<Transform>();
-            //objectVar.GetComponent<Renderer>().material.color = color;
-            objectVar.name = "[LINK] " + name;
-            objectVar.GetComponentInParent<TooltipText>().text = nameObject;
-            return objectVar;
+            GameObject leftSphere = InitSphere(isLGraph, firstPoint, color, parent);
+            GameObject rightSphere = InitSphere(isLGraph, secondPoint, color, parent);
+            return InitLine(isLGraph, linePrefab, leftSphere.transform.position, rightSphere.transform.position, color, parent);
         }
-
-        public GameObject CreateLine(bool isLGraph, Vector3 firstPoint, Vector3 secondPoint, Color32 color)
-        {
-            GameObject leftSphere = InitSphere(isLGraph, firstPoint, color);
-            GameObject rightSphere = InitSphere(isLGraph, secondPoint, color);
-            return InitLine(isLGraph, linePrefab, leftSphere.transform.position, rightSphere.transform.position, color);
-        }
-        private GameObject InitSphere(bool isLGraph, Vector3 point, Color32 color)
+        private GameObject InitSphere(bool isLGraph, Vector3 point, Color32 color, Transform parent)
         {
             GameObject sphere = Instantiate<GameObject>(spherePrefab.gameObject, point, Quaternion.identity, parent);
             sphere = SetProperties(isLGraph, sphere, color);
             return sphere;
         }
-        private GameObject InitLine(bool isLGraph, Transform linePrefab, Vector3 beginPoint, Vector3 endPoint, Color32 color)
+        private GameObject InitLine(bool isLGraph, Transform linePrefab, Vector3 beginPoint, Vector3 endPoint, Color32 color, Transform parent)
         {
             GameObject line = Instantiate<GameObject>(linePrefab.gameObject, Vector3.zero, Quaternion.identity, parent);
             line = SetProperties(isLGraph, line, color);

@@ -6,7 +6,6 @@ namespace nm
     {
         public bool CustomCursor;
         public Texture2D cursorTexture;
-        public InitObject initObject;
         public GameObject boxtooltip;
 
         void Awake()
@@ -20,7 +19,7 @@ namespace nm
 
         void Start()
         {
-            initObject.Create();
+            InitObject.Instance.Create();
         }
     }
     //public static T GetSafeComponent<T>(this GameObject obj) where T : MonoBehaviour

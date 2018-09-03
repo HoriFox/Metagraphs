@@ -21,6 +21,8 @@ namespace nm
         public GameObject startMenu;
         public GameObject aboutMenu;
         public GameObject errorMenu;
+        public float defaultMouseSensitivity = 0.5f;
+        public float defaultSmoothingMotion = 0.36f;
         public KeyCode[] defaultKeys = { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.E, KeyCode.Q, KeyCode.LeftShift };
         public Scrollbar SensitivityScrollbar;
         public Scrollbar SmoothingScrollbar;
@@ -63,8 +65,8 @@ namespace nm
             fail = false;
             menuActive = false;
             updateKey = false;
-            mouseSensitivity = 0.5f;
-            smoothingMotion = 0.36f;
+            mouseSensitivity = defaultMouseSensitivity;
+            smoothingMotion = defaultSmoothingMotion;
             if (!Screen.fullScreen) isFullScreen = false; else isFullScreen = true;
             keys = new KeyCode[defaultKeys.Length];
             for (int i = 0; i < defaultKeys.Length; i++)
@@ -240,13 +242,19 @@ namespace nm
             smoothingMotion = value;
         }
 
-        public void DefaultControlsSitting()
+        public void DefaultKeyBoardSitting()
         {
             for (int i = 0; i < defaultKeys.Length; i++)
             {
                 keys[i] = defaultKeys[i];
                 keyText[i].text = keys[i].ToString();
             }
+        }
+
+        public void DefaultMouseSitting()
+        {
+            SensitivityScrollbar.value = defaultMouseSensitivity;
+            SmoothingScrollbar.value = defaultSmoothingMotion;
         }
 
         // Определение id клавиши, которая будет изменена.

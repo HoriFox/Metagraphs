@@ -8,11 +8,13 @@ namespace nm
 
         public string text;
         public bool arrayShow = false;
+        //public bool active = true;
 
         void IPointerEnterHandler.OnPointerEnter(PointerEventData e)
         {
             Tooltip.text = text;
             Tooltip.arrayShow = arrayShow;
+            //Tooltip.active = active;
             Tooltip.isUI = true;
         }
 

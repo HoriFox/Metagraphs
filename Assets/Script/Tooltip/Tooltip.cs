@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 namespace nm
 {
@@ -7,13 +8,14 @@ namespace nm
     {
 
         public static string text;
+        //public static bool active;
         public static bool arrayShow;
         public static bool isUI;
 
         public Color BGColor = Color.white;
         public Color textColor = Color.black;
         // Размер шрифта.
-        public int fontSize = 14; 
+        public int fontSize = 14;
         // Максимальная ширина Tooltip.
         public int maxWidth = 250;
         // Минимальная ширина Tooltip.
@@ -22,7 +24,7 @@ namespace nm
         public int border = 10;
         // Скорость плавного затухания и проявления.
         public float speed = 10;
-        public RectTransform box;
+        public GameObject box;
         public GameObject arrow;
         public Text boxText;
         public Camera _camera;
@@ -32,6 +34,7 @@ namespace nm
         private Color BGColorFade;
         private Color textColorFade;
         private RectTransform arrowRT;
+        private RectTransform boxRT;
 
         FreeCamera fc;
         EditorMenu em;
@@ -39,11 +42,12 @@ namespace nm
         void Awake()
         {
             borderAround = border * 2;
-            arrowRT = arrow.GetComponent<RectTransform>();
             img = new Image[2];
             img[0] = box.GetComponent<Image>();
+            boxRT = box.GetComponent<RectTransform>();
+            arrowRT = arrow.GetComponent<RectTransform>();
             img[1] = arrowRT.GetComponent<Image>();
-            box.sizeDelta = new Vector2(maxWidth, box.sizeDelta.y);
+            boxRT.sizeDelta = new Vector2(maxWidth, boxRT.sizeDelta.y);
             BGColorFade = BGColor;
             BGColorFade.a = 0;
             textColorFade = textColor;
@@ -54,12 +58,9 @@ namespace nm
                 bg.color = BGColorFade;
             }
             boxText.color = textColorFade;
-            // Добавляем левый бардюр.
-            boxText.rectTransform.position += new Vector3(border, 0f, 0f);
-            // Установка Align. Отношения.
-            //boxText.alignment = TextAnchor.MiddleCenter;
             fc = GameObject.Find("Camera").GetComponent<FreeCamera>();
             em = GameObject.Find("Menu").GetComponent<EditorMenu>();
+            //boxText.alignment = TextAnchor.MiddleCenter;
         }
 
         void LateUpdate()
@@ -76,46 +77,45 @@ namespace nm
                     TooltipText tooltiptext = hit.transform.GetComponent<TooltipText>();
                     text = tooltiptext.text;
                     arrayShow = tooltiptext.arrayShow;
+                    //if (tooltiptext.active)
                     show = true;
                 }
             }
 
             boxText.text = text;
+            //box.SetActive(active);
             arrow.SetActive(arrayShow);
             float width = maxWidth;
             // Если ширина текста соотвествует максимальной ширине.
             if (boxText.preferredWidth <= maxWidth - borderAround) width = boxText.preferredWidth + borderAround;
             // Если финальная ширина меньше минимальной ширины.
             if (width < minWidth) width = minWidth;
-            box.sizeDelta = new Vector2(width, boxText.preferredHeight + borderAround);
-            // Cдвиг позиции стрелки по Х.
-            float arrowShift = width / 4;
+            boxRT.sizeDelta = new Vector2(width, boxText.preferredHeight + borderAround);
+
+            float arrowShift = width / 4; // сдвиг позиции стрелки по Х
 
             if ((show || isUI) && !fc.m_inputCaptured && !em.menuActive)
             {
-                // Gозиция стрелки по умолчанию (внизу).
-                float arrowPositionY = -(arrowRT.sizeDelta.y / 2 - 1); 
+                float arrowPositionY = -(arrowRT.sizeDelta.y / 2 - 1); // позиция стрелки по умолчанию (внизу)
                 float arrowPositionX = arrowShift;
 
-                float curY = Input.mousePosition.y + box.sizeDelta.y / 2 + arrowRT.sizeDelta.y;
+                float curY = Input.mousePosition.y + boxRT.sizeDelta.y / 2 + arrowRT.sizeDelta.y;
                 Vector3 arrowScale = new Vector3(1, 1, 1);
-                // Если Tooltip выходит за рамки экрана, в данном случаи по высоте.
-                if (curY + box.sizeDelta.y / 2 > Screen.height) 
+                if (curY + boxRT.sizeDelta.y / 2 > Screen.height) // если Tooltip выходит за рамки экрана, в данном случаи по высоте
                 {
-                    curY = Input.mousePosition.y - box.sizeDelta.y / 2 - arrowRT.sizeDelta.y;
-                    arrowPositionY = box.sizeDelta.y + (arrowRT.sizeDelta.y / 2 - 1);
-                    // Отражение по вертикале.
-                    arrowScale = new Vector3(1, -1, 1); 
+                    curY = Input.mousePosition.y - boxRT.sizeDelta.y / 2 - arrowRT.sizeDelta.y;
+                    arrowPositionY = boxRT.sizeDelta.y + (arrowRT.sizeDelta.y / 2 - 1);
+                    arrowScale = new Vector3(1, -1, 1); // отражение по вертикале
                 }
 
                 float curX = Input.mousePosition.x + arrowShift;
-                if (curX + box.sizeDelta.x / 2 > Screen.width)
+                if (curX + boxRT.sizeDelta.x / 2 > Screen.width)
                 {
                     curX = Input.mousePosition.x - arrowShift;
                     arrowPositionX = width - arrowShift;
                 }
 
-                box.anchoredPosition = new Vector2(curX, curY);
+                boxRT.anchoredPosition = new Vector2(curX, curY);
 
                 arrowRT.anchoredPosition = new Vector2(arrowPositionX, arrowPositionY);
                 arrowRT.localScale = arrowScale;

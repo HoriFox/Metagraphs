@@ -6,6 +6,6 @@ namespace nm
     {
         public string text;
         public bool arrayShow = false;
-
+        //public bool active = true;
     }
 }
