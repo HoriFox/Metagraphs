@@ -179,51 +179,35 @@ namespace nm
             }
             public void Create(ref Dictionary<string, Structure> structure)
             {
-                Debug.Log("1.2");
                 Structure thisStructure = structure[Name];
-                Debug.Log("1.3");
                 Color32 color = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
 
-                //if (Bonds.Count != 0)
-                //{
-                //    positionFirst = StartVertex.ObjectsTransform[0].position;
-                //    positionSecond = EndVertex.ObjectsTransform[0].position;
+                Vector3 firstPosition = Vector3.zero;
+                Vector3 secondPosition = Vector3.zero;
 
-                //    Debug.Log("Попытались соединить направленный");
-                //}
-                //else if (Predicates.Count > 2)
-                //{
-                //    positionFirst = StartVertex.ObjectsTransform[0].position;
-                //    positionSecond = new Vector3(Random.Range(-1.18f, 1.18f), Random.Range(-1f, 1f), Random.Range(0f, 4f)); // TO DO [ИЗ ЛОГИКИ]
+                if (thisStructure.ChildStructures.Count == 2)
+                {
+                    int k = 0;
+                    foreach (var part in thisStructure.ChildStructures)
+                    {
+                        if (k == 0)
+                        {
+                            firstPosition = part.Value.GetPosition();
+                        }
+                        if (k == 1)
+                        {
+                            secondPosition = part.Value.GetPosition();
+                        }
+                        k++;
+                    }
+                }
+                if (thisStructure.ChildStructures.Count == 0 && thisStructure.Start != null && thisStructure.End != null)
+                {
+                    firstPosition = structure[thisStructure.Start].GetPosition();
+                    secondPosition = structure[thisStructure.End].GetPosition();
+                }
 
-                //    Debug.Log("Попытались соединить несколько детей");
-                //}
-                //else if (Predicates.Count == 2)
-                //{
-                //    int k = 0;
-                //    foreach (var Predicate in Predicates)
-                //    {
-                //        if (k == 0)
-                //        {
-                //            positionFirst = Predicate.Value.ObjectsTransform[0].position;
-                //        }
-                //        if (k == 1)
-                //        {
-                //            positionSecond = Predicate.Value.ObjectsTransform[0].position;
-                //        }
-                //        k++;
-                //    }
-
-                //    Debug.Log("Соединили две простых вершины");
-                //}
-                Debug.Log("1.4");
-                Vector3 firstPosition = structure[thisStructure.Start].GetPosition(); // ОШИБКА ТУТ. TO DO
-                Debug.Log("1.5");
-                Vector3 secondPosition = structure[thisStructure.End].GetPosition(); // ОШИБКА ТУТ. TO DO
-
-                Debug.Log("2");
                 thisStructure.transform[0] = InitObject.Instance.InitLine(false, firstPosition, secondPosition, color, Name);
-                Debug.Log("3");
             }
             public override void OutLog(ref Dictionary<string, Structure> structure)
             {
