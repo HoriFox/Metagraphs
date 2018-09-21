@@ -17,11 +17,11 @@ namespace nm
 
         System.Windows.Forms.OpenFileDialog lDialog;
         System.Windows.Forms.SaveFileDialog sDialog;
-        Reader re;
+        Engine engineM;
 
         void Awake()
         {
-            re = GetComponent<Reader>();
+            engineM = Engine.GetInit();
 
             lDialog = new System.Windows.Forms.OpenFileDialog();
             sDialog = new System.Windows.Forms.SaveFileDialog();
@@ -48,7 +48,7 @@ namespace nm
                 {
                     fileName = lDialog.FileName;
                     string content = File.ReadAllText(fileName);
-                    re.ReadCode(content);
+                    engineM.ReadAndBuild(content);
                 }
                 showDialogLoad = false;
             }

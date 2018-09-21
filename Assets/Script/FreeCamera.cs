@@ -13,9 +13,14 @@ namespace nm
         [Range(0f, 1f)]
         public float smoothness = 0.36f;
 
-        [HideInInspector]
-        public bool m_inputCaptured;
+        [HideInInspector] public bool m_inputCaptured;
         float m_yaw, m_pitch, speed, forward, right, up;
+
+        public Camera _camera;
+        [HideInInspector] public string selectedObject = null;
+        public GameObject changeTransformMenu;
+
+        private StructureModule structureM;
 
         Quaternion rotation;
         EditorMenu em;
@@ -23,6 +28,11 @@ namespace nm
         void Awake()
         {
             em = GameObject.Find("Menu").GetComponent<EditorMenu>();
+        }
+
+        private void Start()
+        {
+            structureM = StructureModule.GetInit();
         }
 
         public void UpdateMouseSetting()
@@ -60,6 +70,33 @@ namespace nm
 
         void Update()
         {
+            if (!m_inputCaptured)
+            {
+                RaycastHit hit;
+                Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    Transform objectHit = hit.collider.transform;
+
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        //Debug.Log(objectHit.name);
+
+                        if (structureM.IsExistNode(objectHit.name))
+                        {
+                            selectedObject = objectHit.name;
+                            changeTransformMenu.SetActive(true);
+                        }
+                        else
+                        {
+                            selectedObject = null;
+                            changeTransformMenu.SetActive(false);
+                        }
+                    }
+                }
+            }
+
             if (Input.GetMouseButtonDown(1) && !em.menuActive)
             {
                 if (!m_inputCaptured)

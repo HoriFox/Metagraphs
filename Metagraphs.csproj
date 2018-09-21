@@ -303,6 +303,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Script\ChangeTransformInterface.cs" />
     <Compile Include="Assets\Script\DebugSctipts\FPSDisplay.cs" />
     <Compile Include="Assets\Script\EditorMenu.cs" />
     <Compile Include="Assets\Script\Engine.cs" />
@@ -310,7 +311,7 @@
     <Compile Include="Assets\Script\InitObject.cs" />
     <Compile Include="Assets\Script\LoadSaveDialog.cs" />
     <Compile Include="Assets\Script\LogicModule.cs" />
-    <Compile Include="Assets\Script\PredicateList.cs" />
+    <Compile Include="Assets\Script\PredicateModule.cs" />
     <Compile Include="Assets\Script\ProgramScrips.cs" />
     <Compile Include="Assets\Script\Reader.cs" />
     <Compile Include="Assets\Script\SceneCleaning.cs" />

@@ -37,27 +37,25 @@ namespace nm
                 if (words[0] == "#") continue;
                 if (words[0] == "GRAPH")
                 {
-                    Transform tr = InitGraph(new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
+                    InitGraph(new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
                         new Color32(byte.Parse(words[5]), byte.Parse(words[6]), byte.Parse(words[7]), 128), words[1], parentSimple);
-                    //tr.GetComponentInParent<TooltipText>().active = false;
                 }
                 if (words[0] == "LGRAPH")
                 {
-                    Transform tr = InitLine(true, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
+                    InitLine(true, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
                         new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
                         new Color32(byte.Parse(words[8]), byte.Parse(words[9]), byte.Parse(words[10]), 128), words[1], parentSimple);
-                    //tr.GetComponentInParent<TooltipText>().active = false;
                 }
                 if (words[0] == "LINK")
                 {
-                    Transform tr = InitLine(false, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
+                    InitLine(false, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
                         new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
                         new Color32(0, 0, 0, 128), words[1], parentSimple);
-                    //tr.GetComponentInParent<TooltipText>().active = false;
                 }
             }
             file.Close();
         }
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         public Transform InitGraph(Vector3 position, Color32 color, string name, Transform parent = null)
         {
@@ -65,7 +63,7 @@ namespace nm
             Transform parentUse = parent ?? parentStandart;
             objectVar = Instantiate(graphPrefab, position, Quaternion.identity, parentUse);
             objectVar.GetComponent<Renderer>().material.color = color;
-            objectVar.name = "[GRAPH] " + name;
+            objectVar.name = /*"[GRAPH] " + */name;
             objectVar.GetComponentInParent<TooltipText>().text = name;
             return objectVar;
         }
@@ -75,7 +73,7 @@ namespace nm
             Transform objectVar;
             Transform parentUse = parent ?? parentStandart;
             objectVar = CreateLine(isLGraph, positionFirst, positionSecond, color, parentUse).GetComponent<Transform>();
-            objectVar.name = (isLGraph) ? "[LGRAPH] " + name : "[LINK] " + name;
+            objectVar.name = /*(isLGraph) ? "[LGRAPH] " + name : "[LINK] " +*/ name;
             objectVar.GetComponentInParent<TooltipText>().text = name;
             return objectVar;
         }

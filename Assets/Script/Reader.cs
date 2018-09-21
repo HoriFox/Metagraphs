@@ -8,36 +8,59 @@ namespace nm
 {
     public class Reader : MonoBehaviour
     {
+        private static Reader init;
+
         bool lastLoadCompleted = true;
-        public Dictionary<string, PredicateList.Predicate> predicate = null;
         [HideInInspector]
         public string reservedContent = null;
+
+        private StructureModule structureM;
+        private Engine engineM;
+
+        private void Awake()
+        {
+            init = this;
+        }
+
+        private void Start()
+        {
+            structureM = StructureModule.GetInit();
+            engineM = Engine.GetInit();
+        }
+
+        public static Reader GetInit()
+        {
+            return init;
+        }
 
         public void ReloadCode()
         {
             if (reservedContent != null && lastLoadCompleted)
             {
-                ReadCode(reservedContent);
+                engineM.ReadAndBuild(reservedContent);
             }
         }
+
         public void ReadCode(string content)
         {
             lastLoadCompleted = false;
             reservedContent = content;
             SceneCleaning.Instance.Clean();
-            predicate = new Dictionary<string, PredicateList.Predicate>();
             string input = content.Replace(" ", string.Empty);
-            //Debug.Log(input);
+            input = input.Replace("\t", string.Empty);
+            input = input.Replace("\n", string.Empty);
+            input = input.Replace("\r", string.Empty);
             var delimiters = new List<string> { ",", "(", ")" };
             string pattern = "(" + String.Join("|", delimiters.Select(d => Regex.Escape(d)).ToArray()) + ")";
             string[] result = Regex.Split(input, pattern);
 
+            structureM.NewStructure();
             ReadAllSctor(result);
         }
 
         public void ReadAllSctor(string[] result)
         {
-            KeyValuePair<PredicateList.Predicate, int> resultCall;
+            KeyValuePair<string, int> resultCall;
             int nowSector = 0;
 
             while (nowSector != result.Length)
@@ -48,6 +71,7 @@ namespace nm
                     case "Metavertex":
                     case "Edge":
                     case "Metaedge":
+                    case "Graph":
                     case "Metagraph":
                     case "Attribute":
                         break;
@@ -55,72 +79,62 @@ namespace nm
                         nowSector++;
                         continue;
                 }
-                resultCall = ReadNowSector(result, nowSector, result[nowSector]);
+                resultCall = ReadNowSector(result, nowSector);
                 nowSector = resultCall.Value;
             }
             lastLoadCompleted = true;
         }
 
-        public KeyValuePair<PredicateList.Predicate, int> ReadNowSector(string[] array, int nowSector, string predicateType)
+        public KeyValuePair<string, int> ReadNowSector(string[] array, int nowSector)
         {
-            // Массив тех частей кода, которые нужны на текущий момент.
-            string[] result = null;
-            // Словарь, который содержит вершины для объединения ребром.
-            Dictionary<string, PredicateList.Vertex> bondsDict = new Dictionary<string, PredicateList.Vertex>();
-            // Словарь, который содержит подчинённые предикаты, для дальнейшего вкладывания в предикат высшего порядка.
-            Dictionary<string, PredicateList.Predicate> predicateChild = new Dictionary<string, PredicateList.Predicate>();
-            // Имя текущего предиката.
-            string predicateName = null;
-            // Нужен только для Attribute. Содержит тип значения атрибута.
-            string predicateValueType = null;
-            // Нужен только для Attribute. Содержит значение атрибута.
-            string predicateValue = null;
-            // Нужен только для Edge. Признак нправленности ребра.
-            bool edgeDirection = false;
-            PredicateList.Predicate currentPredicate = null;
-            // Результат текущего вызова ReadNowSector, который нужен для завершения вызова высшего порядка.
-            KeyValuePair<PredicateList.Predicate, int> resultCall;
-            while (nowSector != array.Length)
+            if (((nowSector) >= array.Length)) return new KeyValuePair<string, int>(null, array.Length);
+
+            int nowLevel = 0;
+            string nowType = null;
+            string nowNameNode = null;
+            List<string> namesChild = new List<string>();
+            KeyValuePair<string, int> resultCall;
+
+            while (nowSector <= array.Length) // !
             {
-                nowSector++;
-                //Debug.Log("3. nowSector: " + nowSector);
-
-                if (((nowSector) >= array.Length)) return new KeyValuePair<PredicateList.Predicate, int>(null, array.Length);
-
-                // Если мы нашли тип данных вида "name=value".
                 if (array[nowSector].Contains("="))
                 {
                     string pattern = "(=)";
-                    result = Regex.Split(array[nowSector], pattern);
+                    string[] localArray = Regex.Split(array[nowSector], pattern);
 
-                    string key = result[2];
-                    switch (result[0])
+                    string value = localArray[2];
+                    switch (localArray[0])
                     {
                         case "Name":
-                            predicateName = key;
+                            nowNameNode = value;
+                            structureM.AddNode(nowNameNode);
                             break;
                         case "Type":
-                            predicateValueType = key;
+                            structureM.AddNodeData(nowNameNode, typeValue: value);
                             break;
                         case "Value":
-                            predicateValue = key;
+                            structureM.AddNodeData(nowNameNode, value: value);
                             break;
                         case "eo":
-                            edgeDirection = bool.Parse(key);
+                            structureM.AddNodeData(nowNameNode, eo: (bool.Parse(value)));
                             break;
                         case "vS":
-                            if (!predicate.ContainsKey(key))
+                            if (!structureM.IsExistNode(value))
                             {
-                                predicate[key] = new PredicateList.Vertex(key);
+                                structureM.AddNode(value);
+                                structureM.AddNodeData(value, "Vertex");
+                                namesChild.Add(value);
                             }
-                            bondsDict["start"] = (PredicateList.Vertex)predicate[key];
+                            structureM.AddNodeData(nowNameNode, start: value);
                             break;
                         case "vE":
-                            if (!predicate.ContainsKey(key))
+                            if (!structureM.IsExistNode(value))
                             {
-                                predicate[key] = new PredicateList.Vertex(key);
+                                structureM.AddNode(value);
+                                structureM.AddNodeData(value, "Vertex");
+                                namesChild.Add(value);
                             }
-                            bondsDict["end"] = (PredicateList.Vertex)predicate[key];
+                            structureM.AddNodeData(nowNameNode, end: value);;
                             break;
                     }
                 }
@@ -129,83 +143,44 @@ namespace nm
                     switch (array[nowSector])
                     {
                         case ",":
+                            break;
                         case "(":
+                            nowLevel++; // Повышаем уровень скобок.
                             break;
                         case ")":
-                            goto ENDRETURN;
+                            nowLevel--; // Понижаем уровень скобок.
+                            structureM.AddNodeData(nowNameNode, nowType);
+                            structureM.AddEnvironment(nowNameNode, childNames: namesChild);
+                            return new KeyValuePair<string, int>(nowNameNode, nowSector + 1);
+
                         case "Vertex":
-                            resultCall = ReadNowSector(array, nowSector, "Vertex");
-                            nowSector = resultCall.Value;
-                            predicateChild[resultCall.Key.Name] = resultCall.Key;
-                            break;
                         case "Metavertex":
-                            resultCall = ReadNowSector(array, nowSector, "Metavertex");
-                            nowSector = resultCall.Value;
-                            predicateChild[resultCall.Key.Name] = resultCall.Key;
-                            break;
                         case "Edge":
-                            resultCall = ReadNowSector(array, nowSector, "Edge");
-                            nowSector = resultCall.Value;
-                            predicateChild[resultCall.Key.Name] = resultCall.Key;
-                            break;
                         case "Metaedge":
-                            resultCall = ReadNowSector(array, nowSector, "Metaedge");
-                            nowSector = resultCall.Value;
-                            predicateChild[resultCall.Key.Name] = resultCall.Key;
-                            break;
+                        case "Graph":
                         case "Metagraph":
-                            resultCall = ReadNowSector(array, nowSector, "Metagraph");
-                            nowSector = resultCall.Value;
-                            predicateChild[resultCall.Key.Name] = resultCall.Key;
-                            break;
                         case "Attribute":
-                            resultCall = ReadNowSector(array, nowSector, "Attribute");
-                            nowSector = resultCall.Value;
-                            predicateChild[resultCall.Key.Name] = resultCall.Key;
-                            break;
-                        default:
-                            // Если это неопределённый тип, то вероятнее всего это примитив Vertex.
-                            if (predicate.ContainsKey(array[nowSector]))
+                            if (nowLevel == 0)
                             {
-                                // Если мы ранее инициализировали это примитив.
-                                predicateChild[array[nowSector]] = predicate[array[nowSector]];
+                                nowType = array[nowSector];
                             }
                             else
                             {
-                                // Если мы ранее НЕ инициализировали это примитив.
-                                PredicateList.Vertex vertex = new PredicateList.Vertex(array[nowSector]);
-                                predicate[vertex.Name] = vertex;
-                                predicateChild[vertex.Name] = vertex;
+                                resultCall = ReadNowSector(array, nowSector);
+                                nowSector = resultCall.Value;
+                                namesChild.Add(resultCall.Key);
                             }
+                            break;
+                        default:
+                            structureM.AddNode(array[nowSector]);
+                            structureM.AddNodeData(array[nowSector], "Vertex");
+                            namesChild.Add(array[nowSector]);
                             break;
                     }
                 }
+                nowSector++;
             }
-            ENDRETURN:
-            switch (predicateType)
-            {
-                case "Vertex":
-                    currentPredicate = new PredicateList.Vertex(predicateName, predicateChild);
-                    break;
-                case "Metavertex":
-                    currentPredicate = new PredicateList.Vertex(predicateName, predicateChild, true);
-                    break;
-                case "Edge":
-                    currentPredicate = new PredicateList.Edge(predicateName, bondsDict, predicateChild, edgeDirection);
-                    break;
-                case "Metaedge":
-                    currentPredicate = new PredicateList.Edge(predicateName, bondsDict, predicateChild, edgeDirection, true);
-                    break;
-                case "Metagraph":
-                    currentPredicate = new PredicateList.Graph(predicateName, predicateChild, true);
-                    break;
-                case "Attribute":
-                    currentPredicate = new PredicateList.Attribute(predicateName, predicateValueType, predicateValue);
-                    break;
-            }
-            //Debug.Log("4. nowSector: " + nowSector);
-            predicate[predicateName] = currentPredicate;
-            return new KeyValuePair<PredicateList.Predicate, int>(currentPredicate, nowSector + 1);
+            return new KeyValuePair<string, int>(nowNameNode, nowSector); // !
         }
     }
 }

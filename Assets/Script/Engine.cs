@@ -8,8 +8,16 @@ namespace nm
         public Texture2D cursorTexture;
         public GameObject boxtooltip;
 
+        private static Engine init;
+
+        public Reader readerM;
+        //public StructureModule structureM;
+        public LogicModule logicM;
+        public PredicateModule predicateM;
+
         void Awake()
         {
+            init = this;
             if (CustomCursor)
             {
                 Cursor.SetCursor(cursorTexture, new Vector2(14, 14), CursorMode.Auto);
@@ -19,19 +27,24 @@ namespace nm
 
         void Start()
         {
+            readerM = Reader.GetInit();
+            //structureM = StructureModule.GetInit();
+            logicM = LogicModule.GetInit();
+            predicateM = PredicateModule.GetInit();
+
             InitObject.Instance.Create();
         }
+
+        public void ReadAndBuild(string content)
+        {
+            readerM.ReadCode(content);
+            logicM.LogicAdd();
+            predicateM.BuildGraphs();
+        }
+
+        public static Engine GetInit()
+        {
+            return init;
+        }
     }
-    //public static T GetSafeComponent<T>(this GameObject obj) where T : MonoBehaviour
-    //{
-    //    T component = obj.GetComponent<T>();
-
-    //    if (component == null)
-    //    {
-    //        Debug.LogError("Expected to find component of type "
-    //           + typeof(T) + " but found none", obj);
-    //    }
-
-    //    return component;
-    //}
 }

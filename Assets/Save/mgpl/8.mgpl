@@ -1,4 +1,8 @@
-Metagraph(Name=mg0,Vertex(Name = v2),Metavertex(Name = mv3),Metavertex(Name = mv5),Metaedge(Name = me1, vS = v2, vE = mv3, Metavertex(Name = mv4), eo = true))
+Metagraph(Name=mg0,
+Vertex(Name = v2),
+Metavertex(Name = mv3),
+Metavertex(Name = mv5),
+Metaedge(Name = me1, vS = v2, vE = mv3, Metavertex(Name = mv4), eo = true))
 
 
 

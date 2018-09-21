@@ -1,1 +1,31 @@
-Metavertex(Name=London,Metavertex(Name=Classmates_group,Vertex(Name=James),Vertex(Name=Paul))),Edge(Name=living,vS=Classmates_group,vE=London,eo=true),Vertex(Name=John),Edge(Name=to_meet, vS=John, vE=Classmates_group, eo=true),Edge(Name=arrived_to, vS=John, vE=London, eo=true,Attribute(Name=has_time,Type=string,Value=4), Attribute(Name=by_transport,Type=pointer,Value=train))
+Metavertex	(
+	Name=London, 
+	Metavertex (
+		Name=Classmates_group,
+		Vertex(Name=James),
+		Vertex(Name=Paul)
+	)
+),
+Edge (
+	Name=living,
+	vS=Classmates_group,
+	vE=London,
+	eo=true
+),
+Vertex ( 
+	Name=John
+),
+Edge (
+	Name=to_meet, 
+	vS=John, 
+	vE=Classmates_group, 
+	eo=true
+),
+Edge (
+	Name=arrived_to, 
+	vS=John, 
+	vE=London, 
+	eo=true,
+	Attribute(Name=has_time,Type=string,Value=4), 
+	Attribute(Name=by_transport,Type=pointer,Value=train)
+)
