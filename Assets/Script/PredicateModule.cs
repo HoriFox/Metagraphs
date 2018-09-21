@@ -56,7 +56,6 @@ namespace nm
 
         public void TactBuild(string name, string objectType)
         {
-            Debug.Log(name + " " + objectType);
             switch (objectType)
             {
                 case "Vertex":
@@ -67,7 +66,6 @@ namespace nm
                     break;
                 case "Edge":
                 case "Metaedge":
-                    Debug.Log("1");
                     new Edge(name, ref structureM.structure);
                     break;
                 case "Attribute":
@@ -116,7 +114,11 @@ namespace nm
                     foreach (var part in structure.ChildStructures)
                     {
                         // Не делаем связь с Edge и MetaEdge
-                        if (structure.ObjectType == "Edge" || structure.ObjectType == "Metaedge") continue;
+                        //Debug.Log(structure.ObjectType);
+                        // TO DO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                        if (part.Value.ObjectType == "Edge" || part.Value.ObjectType == "Metaedge") continue;
+                        // TO DO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                        //Debug.Log("Прошли");
                         Vector3 childPosition = part.Value.GetPosition();
                         structure.transform[n] = InitObject.Instance.InitLine(true, position, childPosition, color, Name);
                         n++;
@@ -149,7 +151,10 @@ namespace nm
                 {
                     foreach (var ot in thisStructure.transform)
                     {
-                        ot.GetComponentInParent<TooltipText>().text = output;
+                        if (ot != null)
+                        {
+                            ot.GetComponentInParent<TooltipText>().text = output;
+                        }
                     }
                 }
                 else
@@ -173,7 +178,6 @@ namespace nm
             public Edge(string name, ref Dictionary<string, Structure> structure)
             {
                 Name = name;
-                Debug.Log("1.1");
                 Create(ref structure);
                 OutLog(ref structure);
             }
@@ -185,27 +189,36 @@ namespace nm
                 Vector3 firstPosition = Vector3.zero;
                 Vector3 secondPosition = Vector3.zero;
 
-                if (thisStructure.ChildStructures.Count == 2)
+                // TO DO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                if (thisStructure.Start != null && thisStructure.End != null)
                 {
-                    int k = 0;
-                    foreach (var part in thisStructure.ChildStructures)
+                    if (thisStructure.ChildStructures.Count == 2)
                     {
-                        if (k == 0)
+                        int k = 0;
+                        foreach (var part in thisStructure.ChildStructures)
                         {
-                            firstPosition = part.Value.GetPosition();
+                            if (k == 0)
+                            {
+                                firstPosition = part.Value.GetPosition();
+                            }
+                            if (k == 1)
+                            {
+                                secondPosition = part.Value.GetPosition();
+                            }
+                            k++;
                         }
-                        if (k == 1)
-                        {
-                            secondPosition = part.Value.GetPosition();
-                        }
-                        k++;
+                    }
+                    else if(thisStructure.ChildStructures.Count == 0)
+                    {
+                        firstPosition = structure[thisStructure.Start].GetPosition();
+                        secondPosition = structure[thisStructure.End].GetPosition();
                     }
                 }
-                if (thisStructure.ChildStructures.Count == 0 && thisStructure.Start != null && thisStructure.End != null)
+                else
                 {
                     firstPosition = structure[thisStructure.Start].GetPosition();
                     secondPosition = structure[thisStructure.End].GetPosition();
-                }
+                } // TO DO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 thisStructure.transform[0] = InitObject.Instance.InitLine(false, firstPosition, secondPosition, color, Name);
             }
