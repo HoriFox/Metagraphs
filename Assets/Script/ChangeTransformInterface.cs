@@ -56,8 +56,8 @@ namespace nm
             if (saveSelectName != null && targetObject.position != positionSelected)
             {
                 // Говорим, что теперь выделенный объект использует свои координаты.
-                targetObject.isUsingCustomPosition = true;
-                targetObject.customPosition = positionSelected;
+                //targetObject.isUsingCustomPosition = true;
+                targetObject.position = positionSelected;
 
                 // Пересоздаём всех детей.
                 foreach (var part in targetObject.ChildStructures)

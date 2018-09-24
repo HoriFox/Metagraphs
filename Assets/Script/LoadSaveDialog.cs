@@ -35,19 +35,19 @@ namespace nm
             lDialog.RestoreDirectory = true;
             lDialog.InitialDirectory = @"C:\\";
             lDialog.Title = "Please select the Metafile file. ";
-            lDialog.Filter = "MGPL Files (*.MGPL) | *.mgpl |All Files | *.* ";
+            lDialog.Filter = "MGPL Files (*.mgpl) | *.mgpl |All Files | *.* ";
 
             lcDialog.RestoreDirectory = true;
             lcDialog.InitialDirectory = @"C:\\";
             lcDialog.Title = "Please select the configuration file. ";
-            lcDialog.Filter = "JSON Files | (*.json) |All Files | *.* ";
+            lcDialog.Filter = "JSON Files (*.json) | *.json |All Files | *.* ";
 
             sDialog.AddExtension = true;
             sDialog.OverwritePrompt = true;
             sDialog.RestoreDirectory = true;
             sDialog.InitialDirectory = @"C:\\";
             sDialog.Title = "Save the Metagraph json file. ";
-            sDialog.Filter = "JSON Files (*.JSON) | *.json |All Files | *.* ";
+            sDialog.Filter = "JSON Files (*.json) | *.json |All Files | *.* ";
         }
 
 
@@ -73,8 +73,7 @@ namespace nm
                 if (lcDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     fileName = lcDialog.FileName;
-                //    string content = File.ReadAllText(fileName);
-                //    engineM.ReadAndBuild(content);
+                    structureM.LoadingJson(fileName);
                 }
                 showDialogLoadConfiguration = false;
             }

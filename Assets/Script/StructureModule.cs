@@ -11,70 +11,34 @@ namespace nm
     public class Structure
     {
         public string Name = null;
-        [NonSerialized]
-        public string ObjectType = null;
-        [NonSerialized]
-        public bool Eo = false;
-        [NonSerialized]
-        public bool Metatype = false;
-        [NonSerialized]
-        public string Start = null;
-        [NonSerialized]
-        public string End = null;
-        [NonSerialized]
-        public string TypeValue = null;
-        [NonSerialized]
-        public string Value = null;
-
         public Vector3 position;
         public Vector3 rotationEuler;
-
-        public bool isUsingCustomPosition = false;
-        public bool isUsingCustomRotation = false;
-
-        public Vector3 customPosition;
-        public Vector3 customRotationEuler;
-        [NonSerialized]
-        public List<GameObject> gameObject = new List<GameObject>();
-
         public Color32 color = new Color32(0, 0, 0, 0);
-        [NonSerialized]
-        public Dictionary<string, Structure> ParentStructures = new Dictionary<string, Structure>();
-        [NonSerialized]
-        public Dictionary<string, Structure> ChildStructures = new Dictionary<string, Structure>();
+        public string ObjectType = null;
+        public bool Eo = false;
+        public bool Metatype = false;
+        public string Start = null;
+        public string End = null;
+        public string TypeValue = null;
+        public string Value = null;
+
+        // Дополняется с помощью специальной функции после чтения. Соединяем созданные в структуре объекты.
+        [NonSerialized] public Dictionary<string, Structure> ParentStructures = new Dictionary<string, Structure>();
+        [NonSerialized] public Dictionary<string, Structure> ChildStructures = new Dictionary<string, Structure>();
+
+        // Добавляет программа.
+        [NonSerialized] public List<GameObject> gameObject = new List<GameObject>();
 
         public Vector3 GetPosition()
         {
-            return (isUsingCustomPosition) ? customPosition : position;
+            return position;
         }
 
         public Vector3 GetRotation()
         {
-            return (isUsingCustomRotation) ? customRotationEuler : rotationEuler;
+            return rotationEuler;
         }
     }
-
-    //public class TransformStructure
-    //{
-    //    public Vector3 position;
-    //    public Vector3 rotationEuler;
-
-    //    public bool isUsingCustomPosition = false;
-    //    public bool isUsingCustomRotation = false;
-
-    //    public Vector3 customPosition;
-    //    public Vector3 customRotationEuler;
-
-    //    public Vector3 GetPosition()
-    //    {
-    //        return (isUsingCustomPosition) ? customPosition : position;
-    //    }
-
-    //    public Vector3 GetRotation()
-    //    {
-    //        return (isUsingCustomRotation) ? customRotationEuler : rotationEuler;
-    //    }
-    //}
 
     public class StructureModule : MonoBehaviour
     {
@@ -100,14 +64,20 @@ namespace nm
         // Загрузка из JSON.
         public void LoadingJson(string path)
         {
-            //using (StreamWriter stream = new StreamWriter(path))
-            //{
-            //    foreach (var child in structure)
-            //    {
-            //        string json = JsonUtility.ToJson(child.Value);
-            //        stream.Write(json);
-            //    }
-            //}
+            try
+            {
+                using (StreamReader sr = new StreamReader(path))
+                {
+                    string json = sr.ReadLine();
+                    Structure structure = JsonUtility.FromJson<Structure>(json);
+                    Debug.Log(structure.Name);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("The file could not be read:");
+                Debug.LogError(e.Message);
+            }
         }
 
         // Выгрузка в JSON.
@@ -115,7 +85,7 @@ namespace nm
         {
             using (StreamWriter stream = new StreamWriter(path))
             {
-                foreach(var child in structure)
+                foreach (var child in structure) // Нужно сделать нормальный стандартный вывод массива JSON. TO DO
                 {
                     string json = JsonUtility.ToJson(child.Value);
                     stream.Write(json);
