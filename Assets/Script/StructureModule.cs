@@ -1,20 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.IO;
 
 namespace nm
 {
+    // История из раздела "Почему медленно работает прога?"
+    [Serializable]
     public class Structure
     {
-        // Для Creator.
         public string Name = null;
+        [NonSerialized]
         public string ObjectType = null;
-        public Vector3 FixingPoint = new Vector3();
+        [NonSerialized]
         public bool Eo = false;
+        [NonSerialized]
         public bool Metatype = false;
+        [NonSerialized]
         public string Start = null;
+        [NonSerialized]
         public string End = null;
+        [NonSerialized]
         public string TypeValue = null;
+        [NonSerialized]
         public string Value = null;
 
         public Vector3 position;
@@ -25,10 +34,13 @@ namespace nm
 
         public Vector3 customPosition;
         public Vector3 customRotationEuler;
+        [NonSerialized]
+        public List<GameObject> gameObject = new List<GameObject>();
 
-        public Transform[] transform = new Transform[1];
-
+        public Color32 color = new Color32(0, 0, 0, 0);
+        [NonSerialized]
         public Dictionary<string, Structure> ParentStructures = new Dictionary<string, Structure>();
+        [NonSerialized]
         public Dictionary<string, Structure> ChildStructures = new Dictionary<string, Structure>();
 
         public Vector3 GetPosition()
@@ -41,6 +53,28 @@ namespace nm
             return (isUsingCustomRotation) ? customRotationEuler : rotationEuler;
         }
     }
+
+    //public class TransformStructure
+    //{
+    //    public Vector3 position;
+    //    public Vector3 rotationEuler;
+
+    //    public bool isUsingCustomPosition = false;
+    //    public bool isUsingCustomRotation = false;
+
+    //    public Vector3 customPosition;
+    //    public Vector3 customRotationEuler;
+
+    //    public Vector3 GetPosition()
+    //    {
+    //        return (isUsingCustomPosition) ? customPosition : position;
+    //    }
+
+    //    public Vector3 GetRotation()
+    //    {
+    //        return (isUsingCustomRotation) ? customRotationEuler : rotationEuler;
+    //    }
+    //}
 
     public class StructureModule : MonoBehaviour
     {
@@ -61,6 +95,32 @@ namespace nm
         public void NewStructure()
         {
             structure = new Dictionary<string, Structure>();
+        }
+
+        // Загрузка из JSON.
+        public void LoadingJson(string path)
+        {
+            //using (StreamWriter stream = new StreamWriter(path))
+            //{
+            //    foreach (var child in structure)
+            //    {
+            //        string json = JsonUtility.ToJson(child.Value);
+            //        stream.Write(json);
+            //    }
+            //}
+        }
+
+        // Выгрузка в JSON.
+        public void UnloadingJson(string path)
+        {
+            using (StreamWriter stream = new StreamWriter(path))
+            {
+                foreach(var child in structure)
+                {
+                    string json = JsonUtility.ToJson(child.Value);
+                    stream.Write(json);
+                }
+            }
         }
 
         public Structure AddNode(string name)

@@ -13,12 +13,13 @@ namespace nm
         {
             Instance = this;
             parentSimple = new GameObject("TestSimple").transform;
+
+            resourceM = ResourceManager.GetInstance();
         }
 
+        [HideInInspector] public ResourceManager resourceM;
+
         public Transform parentStandart;
-        public Transform linePrefab;
-        public Transform graphPrefab;
-        public Transform spherePrefab;
         public Vector3 scaleLGraph = new Vector3(0.2f, 0.2f, 0.2f);
         public Vector3 scaleLink = new Vector3(0.05f, 0.05f, 0.05f);
 
@@ -57,42 +58,46 @@ namespace nm
         }
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        public Transform InitGraph(Vector3 position, Color32 color, string name, Transform parent = null)
+        public GameObject InitGraph(Vector3 position, Color32 color, string _name, Transform parent = null)
         {
-            Transform objectVar;
+            GameObject objectVar;
             Transform parentUse = parent ?? parentStandart;
-            objectVar = Instantiate(graphPrefab, position, Quaternion.identity, parentUse);
+            objectVar = Instantiate(resourceM.GetPrefab("GraphPrefab"), position, Quaternion.identity, parentUse).gameObject;
             objectVar.GetComponent<Renderer>().material.color = color;
-            objectVar.name = /*"[GRAPH] " + */name;
-            objectVar.GetComponentInParent<TooltipText>().text = name;
+            objectVar.name = _name;
+            objectVar.GetComponentInParent<TooltipText>().text = _name;
             return objectVar;
         }
 
-        public Transform InitLine(bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, Color32 color, string name, Transform parent = null)
+        public List<GameObject> InitLine(bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, Color32 color, string _name, Transform parent = null)
         {
-            Transform objectVar;
             Transform parentUse = parent ?? parentStandart;
-            objectVar = CreateLine(isLGraph, positionFirst, positionSecond, color, parentUse).GetComponent<Transform>();
-            objectVar.name = /*(isLGraph) ? "[LGRAPH] " + name : "[LINK] " +*/ name;
-            objectVar.GetComponentInParent<TooltipText>().text = name;
-            return objectVar;
+            List<GameObject> gameObjects = CreateLine(isLGraph, positionFirst, positionSecond, color, parentUse);
+            foreach (var part in gameObjects)
+            {
+                part.name = _name;
+                part.GetComponentInParent<TooltipText>().text = _name;
+            }
+            return gameObjects;
         }
 
-        private GameObject CreateLine(bool isLGraph, Vector3 firstPoint, Vector3 secondPoint, Color32 color, Transform parent)
+        private List<GameObject> CreateLine(bool isLGraph, Vector3 firstPoint, Vector3 secondPoint, Color32 color, Transform parent)
         {
-            GameObject leftSphere = InitSphere(isLGraph, firstPoint, color, parent);
-            GameObject rightSphere = InitSphere(isLGraph, secondPoint, color, parent);
-            return InitLine(isLGraph, linePrefab, leftSphere.transform.position, rightSphere.transform.position, color, parent);
+            List<GameObject> gameObjects = new List<GameObject>();
+            gameObjects.Add(InitSphere(isLGraph, firstPoint, color, parent));
+            gameObjects.Add(InitSphere(isLGraph, secondPoint, color, parent));
+            gameObjects.Add(InitLine(isLGraph, gameObjects[0].transform.position, gameObjects[1].transform.position, color, parent));
+            return gameObjects;
         }
         private GameObject InitSphere(bool isLGraph, Vector3 point, Color32 color, Transform parent)
         {
-            GameObject sphere = Instantiate<GameObject>(spherePrefab.gameObject, point, Quaternion.identity, parent);
+            GameObject sphere = Instantiate(resourceM.GetPrefab("SpherePrefab"), point, Quaternion.identity, parent);
             sphere = SetProperties(isLGraph, sphere, color);
             return sphere;
         }
-        private GameObject InitLine(bool isLGraph, Transform linePrefab, Vector3 beginPoint, Vector3 endPoint, Color32 color, Transform parent)
+        private GameObject InitLine(bool isLGraph, Vector3 beginPoint, Vector3 endPoint, Color32 color, Transform parent)
         {
-            GameObject line = Instantiate<GameObject>(linePrefab.gameObject, Vector3.zero, Quaternion.identity, parent);
+            GameObject line = Instantiate(resourceM.GetPrefab("LinePrefab"), Vector3.zero, Quaternion.identity, parent);
             line = SetProperties(isLGraph, line, color);
             UpdateLinePosition(line, beginPoint, endPoint);
             return line;

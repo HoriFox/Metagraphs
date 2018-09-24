@@ -104,31 +104,28 @@ namespace nm
             public void Create(Structure structure)
             {
                 Vector3 position = structure.GetPosition();
-                Color32 color = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
+                // Проверка через одно место. Если альфа канал 0, то цвет не установлен. TO DO
+                if (structure.color.a == 0)
+                {
+                    structure.color = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
+                }
 
                 if (structure.ChildStructures != null && structure.ChildStructures.Count >= 1)
                 {
-                    structure.transform = new Transform[structure.ChildStructures.Count];
                     // Вершина-связь.
-                    int n = 0;
                     foreach (var part in structure.ChildStructures)
                     {
                         // Не делаем связь с Edge и MetaEdge
-                        //Debug.Log(structure.ObjectType);
-                        // TO DO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         if (part.Value.ObjectType == "Edge" || part.Value.ObjectType == "Metaedge") continue;
-                        // TO DO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        //Debug.Log("Прошли");
                         Vector3 childPosition = part.Value.GetPosition();
-                        structure.transform[n] = InitObject.Instance.InitLine(true, position, childPosition, color, Name);
-                        n++;
+                        structure.gameObject.AddRange(InitObject.Instance.InitLine(true, position, childPosition, structure.color, Name));
                     }
                 }
                 else
                 {
                     // Вершина-сфера.
                     // Обязательно класть transform в структуру.
-                    structure.transform[0] = InitObject.Instance.InitGraph(position, color, Name);
+                    structure.gameObject.Add(InitObject.Instance.InitGraph(position, structure.color, Name));
                 }
             }
             public override void OutLog(ref Dictionary<string, Structure> structure)
@@ -147,19 +144,9 @@ namespace nm
                         output += "\n" + child.Value.Name;
                     }
                 }
-                if (thisStructure.transform.Length != 0)
+                foreach (var childPart in thisStructure.gameObject)
                 {
-                    foreach (var ot in thisStructure.transform)
-                    {
-                        if (ot != null)
-                        {
-                            ot.GetComponentInParent<TooltipText>().text = output;
-                        }
-                    }
-                }
-                else
-                {
-                    thisStructure.transform[0].GetComponentInParent<TooltipText>().text = output;
+                    childPart.transform.GetComponentInParent<TooltipText>().text = output;
                 }
             }
         }
@@ -184,13 +171,22 @@ namespace nm
             public void Create(ref Dictionary<string, Structure> structure)
             {
                 Structure thisStructure = structure[Name];
-                Color32 color = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
+
+                // Проверка через одно место. Если альфа канал 0, то цвет не установлен. TO DO
+                if (thisStructure.color.a == 0)
+                {
+                    thisStructure.color = new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
+                }
 
                 Vector3 firstPosition = Vector3.zero;
                 Vector3 secondPosition = Vector3.zero;
 
-                // TO DO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 if (thisStructure.Start != null && thisStructure.End != null)
+                {
+                    firstPosition = structure[thisStructure.Start].GetPosition();
+                    secondPosition = structure[thisStructure.End].GetPosition();
+                }
+                else
                 {
                     if (thisStructure.ChildStructures.Count == 2)
                     {
@@ -208,19 +204,8 @@ namespace nm
                             k++;
                         }
                     }
-                    else if(thisStructure.ChildStructures.Count == 0)
-                    {
-                        firstPosition = structure[thisStructure.Start].GetPosition();
-                        secondPosition = structure[thisStructure.End].GetPosition();
-                    }
                 }
-                else
-                {
-                    firstPosition = structure[thisStructure.Start].GetPosition();
-                    secondPosition = structure[thisStructure.End].GetPosition();
-                } // TO DO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                thisStructure.transform[0] = InitObject.Instance.InitLine(false, firstPosition, secondPosition, color, Name);
+                thisStructure.gameObject.AddRange(InitObject.Instance.InitLine(false, firstPosition, secondPosition, thisStructure.color, Name));
             }
             public override void OutLog(ref Dictionary<string, Structure> structure)
             {
@@ -266,7 +251,10 @@ namespace nm
                         output += "\n" + child.Value.Name;
                     }
                 }
-                thisStructure.transform[0].GetComponentInParent<TooltipText>().text = output;
+                foreach (var childPart in thisStructure.gameObject)
+                {
+                    childPart.transform.GetComponentInParent<TooltipText>().text = output;
+                }
             }
         }
 
@@ -306,6 +294,7 @@ namespace nm
                             Structure valueStructure = structure[thisStructure.Value];
                             output = valueStructure.Value + " (" + valueStructure.ObjectType + ")";
                         }
+                        Debug.Log("<b>Attribute |</b> Name: " + Name + " | " + output);
                         break;
                 }
             }

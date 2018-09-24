@@ -10,10 +10,10 @@ namespace nm
 
         private static Engine init;
 
-        public Reader readerM;
+        [HideInInspector] public Reader readerM;
         //public StructureModule structureM;
-        public LogicModule logicM;
-        public PredicateModule predicateM;
+        [HideInInspector] public LogicModule logicM;
+        [HideInInspector] public PredicateModule predicateM;
 
         void Awake()
         {

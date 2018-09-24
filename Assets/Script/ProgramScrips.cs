@@ -21,10 +21,15 @@ namespace nm
             GetComponent<LoadSaveDialog>().showDialogSave = true;
         }
 
-        // Загрузка.
-        public void Load()
+        // Загрузка mgpl файла.
+        public void LoadMGPL()
         {
-            GetComponent<LoadSaveDialog>().showDialogLoad = true;
+            GetComponent<LoadSaveDialog>().showDialogLoadMGPL = true;
+        }
+        // Загрузка конфигурации.
+        public void LoadConfiguration()
+        {
+            GetComponent<LoadSaveDialog>().showDialogLoadConfiguration = true;
         }
         // Назад.
         public void Backward()

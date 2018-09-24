@@ -314,6 +314,7 @@
     <Compile Include="Assets\Script\PredicateModule.cs" />
     <Compile Include="Assets\Script\ProgramScrips.cs" />
     <Compile Include="Assets\Script\Reader.cs" />
+    <Compile Include="Assets\Script\ResourceManager.cs" />
     <Compile Include="Assets\Script\SceneCleaning.cs" />
     <Compile Include="Assets\Script\StructureModule.cs" />
     <Compile Include="Assets\Script\SuperBlur\SuperBlur.cs" />
