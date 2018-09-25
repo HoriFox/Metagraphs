@@ -123,18 +123,18 @@ namespace nm
                             {
                                 structureM.AddNode(value);
                                 structureM.AddNodeData(value, "Vertex");
-                                namesChild.Add(value);
                             }
-                            structureM.AddNodeData(nowNameNode, start: value);
+                            structureM.AddNodeData(nowNameNode, start: value); // ? TO DO
+                            namesChild.Add(value);
                             break;
                         case "vE":
                             if (!structureM.IsExistNode(value))
                             {
                                 structureM.AddNode(value);
                                 structureM.AddNodeData(value, "Vertex");
-                                namesChild.Add(value);
                             }
-                            structureM.AddNodeData(nowNameNode, end: value);;
+                            structureM.AddNodeData(nowNameNode, end: value); // ? TO DO
+                            namesChild.Add(value);
                             break;
                     }
                 }

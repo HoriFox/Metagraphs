@@ -5,9 +5,8 @@ using UnityEngine.UI;
 
 namespace nm
 {
-    public class ChangeTransformInterface : MonoBehaviour
+    public class ChangeTransform : MonoBehaviour
     {
-        public Transform _camera;
         private FreeCamera freeC;
         private StructureModule structureM;
         private PredicateModule predicateM;
@@ -25,17 +24,14 @@ namespace nm
         public Transform inputZPosition;
         private InputField inputZPositionOut;
 
-        private string SaveXPosition = null;
-        private string SaveYPosition = null;
-        private string SaveZPosition = null;
+        private Vector3 SavePosition = new Vector3(0f, 0f, 0f);
 
         private GameObject markerObject = null;
-        private Vector3 newPosition;
-        private Structure targetObject = null;
+        private Structure targetObject = new Structure();
 
         private void Awake()
         {
-            freeC = _camera.GetComponent<FreeCamera>();
+            freeC = Camera.main.GetComponent<FreeCamera>();
         }
 
         private void Start()
@@ -43,6 +39,9 @@ namespace nm
             structureM = StructureModule.GetInit();
             predicateM = PredicateModule.GetInit();
             resourceM = ResourceManager.GetInstance();
+
+            markerObject = Instantiate(resourceM.GetPrefab("LabelPrefab"), positionSelected, Quaternion.Euler(0f, 0f, 0f));
+            markerObject.SetActive(false);
 
             inputXPositionOut = inputXPosition.GetComponent<InputField>();
             inputYPositionOut = inputYPosition.GetComponent<InputField>();
@@ -55,8 +54,6 @@ namespace nm
         {
             if (saveSelectName != null && targetObject.position != positionSelected)
             {
-                // Говорим, что теперь выделенный объект использует свои координаты.
-                //targetObject.isUsingCustomPosition = true;
                 targetObject.position = positionSelected;
 
                 // Пересоздаём всех детей.
@@ -85,9 +82,9 @@ namespace nm
             foreach (var part in gameObject)
             {
                 Destroy(part);
-                Debug.Log("Удалили объект с локальным индексом: " + k);
                 k++;
             }
+            gameObject.Clear();
         }
 
         public void ResetChangeTransform()
@@ -95,7 +92,7 @@ namespace nm
             saveSelectName = null;
             freeC.selectedObject = null;
             freeC.changeTransformMenu.SetActive(false);
-            Destroy(markerObject);
+            markerObject.SetActive(false);
             positionSelected = new Vector3(0f, 0f, 0f);
         }
 
@@ -103,26 +100,20 @@ namespace nm
         {
             if (markerObject != null)
             {
-                if (inputXPositionOut.text != SaveXPosition)
+                if (markerObject.transform.localPosition.x != SavePosition.x)
                 {
-                    SaveXPosition = inputXPositionOut.text;
-                    newPosition.x = float.Parse(SaveXPosition);
+                    SavePosition.x = markerObject.transform.localPosition.x;
+                    positionSelected.x = SavePosition.x;
                 }
-                if (inputYPositionOut.text != SaveYPosition)
+                if (markerObject.transform.localPosition.y != SavePosition.y)
                 {
-                    SaveYPosition = inputYPositionOut.text;
-                    newPosition.y = float.Parse(SaveYPosition);
+                    SavePosition.y = markerObject.transform.localPosition.y;
+                    positionSelected.y = SavePosition.y;
                 }
-                if (inputZPositionOut.text != SaveZPosition)
+                if (markerObject.transform.localPosition.z != SavePosition.z)
                 {
-                    SaveZPosition = inputZPositionOut.text;
-                    newPosition.z = float.Parse(SaveZPosition);
-                }
-
-                if (newPosition.x != positionSelected.x || newPosition.y != positionSelected.y || newPosition.z != positionSelected.z)
-                {
-                    positionSelected = newPosition;
-                    markerObject.transform.position = new Vector3(newPosition.x, newPosition.y, newPosition.z);
+                    SavePosition.z = markerObject.transform.localPosition.z;
+                    positionSelected.z = SavePosition.z;
                 }
 
                 if (Input.GetKeyDown(KeyCode.Escape))
@@ -137,23 +128,12 @@ namespace nm
                 if (saveSelectName != null)
                 {
                     targetObject = structureM.structure[saveSelectName];
-                    positionSelected = targetObject.GetPosition();
-
-                    newPosition.x = positionSelected.x;
-                    inputXPositionOut.text = positionSelected.x.ToString();
-
-                    newPosition.y = positionSelected.y;
-                    inputYPositionOut.text = positionSelected.y.ToString();
-
-                    newPosition.z = positionSelected.z;
-                    inputZPositionOut.text = positionSelected.z.ToString();
-
-                    Destroy(markerObject);
-                    markerObject = Instantiate(resourceM.GetPrefab("LabelPrefab"), positionSelected, Quaternion.Euler(0f, 0f, 0f));
+                    markerObject.transform.position = targetObject.GetPosition();
+                    markerObject.SetActive(true);
                 }
                 else
                 {
-                    Destroy(markerObject);
+                    markerObject.SetActive(false);
                 }
             }
         }

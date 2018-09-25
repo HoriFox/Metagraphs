@@ -90,8 +90,11 @@ namespace nm
                         }
                         else
                         {
-                            selectedObject = null;
-                            changeTransformMenu.SetActive(false);
+                            if (objectHit.tag != "CustomTransform")
+                            {
+                                selectedObject = null;
+                                changeTransformMenu.SetActive(false);
+                            }
                         }
                     }
                 }

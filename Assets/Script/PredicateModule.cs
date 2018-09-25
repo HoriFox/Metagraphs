@@ -74,13 +74,6 @@ namespace nm
             }
         }
 
-        // Все элементы описания.
-        public class Predicate
-        {
-            public virtual string Name { get; set; }
-            public virtual void OutLog(ref Dictionary<string, Structure> structure) { }
-        }
-
         /// <summary>
         /// Вершина/Метавершина.
         /// Важно учитывать, что у класса вершины есть Dictionary, который очень чувствителен
@@ -90,10 +83,10 @@ namespace nm
         /// Метаграф/граф. Когда я это писал, я точно не знал нужно ли делать Graph двухуровневым.
         /// Поэтому настройка metatype стоит по стандарту на true, другими словами, Metagraph.
         /// </summary>
-        public class VertexGraph : Predicate
+        public class VertexGraph
         {
             // Название объекта.
-            public override string Name { get; set; }
+            public string Name { get; set; }
 
             public VertexGraph(string name, ref Dictionary<string, Structure> structure)
             {
@@ -128,7 +121,7 @@ namespace nm
                     structure.gameObject.Add(InitObject.Instance.InitGraph(position, structure.color, Name));
                 }
             }
-            public override void OutLog(ref Dictionary<string, Structure> structure)
+            public void OutLog(ref Dictionary<string, Structure> structure)
             {
                 Structure thisStructure = structure[Name];
                 string NameObject = thisStructure.ObjectType;
@@ -157,10 +150,10 @@ namespace nm
         /// Ребро может быть МетаРебром, за это отвечает bool параметр MetaType.
         /// Ребро может быть направленным (eo=true), от указанного StartVertex до EndVertex. 
         /// </summary>
-        public class Edge : Predicate
+        public class Edge
         {
             // Название объекта.
-            public override string Name { get; set; }
+            public string Name { get; set; }
 
             public Edge(string name, ref Dictionary<string, Structure> structure)
             {
@@ -207,7 +200,7 @@ namespace nm
                 }
                 thisStructure.gameObject.AddRange(InitObject.Instance.InitLine(false, firstPosition, secondPosition, thisStructure.color, Name));
             }
-            public override void OutLog(ref Dictionary<string, Structure> structure)
+            public void OutLog(ref Dictionary<string, Structure> structure)
             {
                 Structure thisStructure = structure[Name];
                 string Chain = null;
@@ -261,10 +254,10 @@ namespace nm
         /// <summary>
         /// Атрибут.
         /// </summary>
-        public class Attribute : Predicate
+        public class Attribute
         {
             // Название объекта.
-            public override string Name { get; set; }
+            public string Name { get; set; }
 
             public Attribute(string name, ref Dictionary<string, Structure> structure)
             {
@@ -276,7 +269,7 @@ namespace nm
             {
                 //Structure thisStructure = structure[Name];
             }
-            public override void OutLog(ref Dictionary<string, Structure> structure)
+            public void OutLog(ref Dictionary<string, Structure> structure)
             {
                 Structure thisStructure = structure[Name];
 

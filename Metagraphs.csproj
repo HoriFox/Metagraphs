@@ -303,7 +303,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Script\ChangeTransformInterface.cs" />
+    <Compile Include="Assets\Script\CustomTransform\ChangeTransform.cs" />
+    <Compile Include="Assets\Script\CustomTransform\CTransform.cs" />
     <Compile Include="Assets\Script\DebugSctipts\FPSDisplay.cs" />
     <Compile Include="Assets\Script\EditorMenu.cs" />
     <Compile Include="Assets\Script\Engine.cs" />
