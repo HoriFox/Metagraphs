@@ -11,7 +11,6 @@ namespace nm
         private static Engine init;
 
         [HideInInspector] public Reader readerM;
-        //public StructureModule structureM;
         [HideInInspector] public LogicModule logicM;
         [HideInInspector] public PredicateModule predicateM;
 
@@ -28,11 +27,10 @@ namespace nm
         void Start()
         {
             readerM = Reader.GetInit();
-            //structureM = StructureModule.GetInit();
             logicM = LogicModule.GetInit();
             predicateM = PredicateModule.GetInit();
 
-            InitObject.Instance.Create();
+            //InitObject.Instance.Create();
         }
 
         public void ReadAndBuild(string content)

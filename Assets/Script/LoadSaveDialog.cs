@@ -11,7 +11,7 @@ namespace nm
         [HideInInspector]
         public bool showDialogLoadMGPL = false;
         [HideInInspector]
-        public bool showDialogLoadConfiguration = false;
+        public bool showDialogLoadJSON = false;
         [HideInInspector]
         public bool showDialogSave = false;
 
@@ -39,7 +39,7 @@ namespace nm
 
             lcDialog.RestoreDirectory = true;
             lcDialog.InitialDirectory = @"C:\\";
-            lcDialog.Title = "Please select the configuration file. ";
+            lcDialog.Title = "Please select the Metagraph json file. ";
             lcDialog.Filter = "JSON Files (*.json) | *.json |All Files | *.* ";
 
             sDialog.AddExtension = true;
@@ -68,14 +68,14 @@ namespace nm
                 }
                 showDialogLoadMGPL = false;
             }
-            if (showDialogLoadConfiguration == true)
+            if (showDialogLoadJSON == true)
             {
                 if (lcDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     fileName = lcDialog.FileName;
                     structureM.LoadingJson(fileName);
                 }
-                showDialogLoadConfiguration = false;
+                showDialogLoadJSON = false;
             }
             if (showDialogSave == true)
             {

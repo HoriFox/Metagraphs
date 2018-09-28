@@ -32,7 +32,7 @@ namespace nm
         {
             structureM = StructureModule.GetInit();
 
-            Distribution();
+            //Distribution(); TO DO
         }
 
         public static LogicModule GetInit()
@@ -46,10 +46,6 @@ namespace nm
             {
                 part.Value.position = new Vector3(UnityEngine.Random.Range(-1.18f, 1.18f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(0f, 4f));
             }
-
-            // 1. Располагаем Vertex и Metavertex
-            // 2. Располагаем Graph и Metagraph
-            // 3. Соединяем предыдущие объекты с помощью Edge и Metaedge
         }
 
         private void CalculationSolidAngle()
@@ -108,15 +104,15 @@ namespace nm
 
         private double golden_angle = Math.PI * (5 - Math.Sqrt(5));
 
-        void Update()
-        {
-            if (rebuild)
-            {
-                Destroy(parent);
-                Distribution();
-                rebuild = false;
-            }
-        }
+        //void Update()
+        //{
+        //    if (rebuild)
+        //    {
+        //        Destroy(parent);
+        //        Distribution();
+        //        rebuild = false;
+        //    }
+        //}
 
     }
 }

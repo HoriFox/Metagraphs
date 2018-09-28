@@ -15,15 +15,6 @@ namespace nm
         [HideInInspector] public Vector3 positionSelected = new Vector3(0f, 0f, 0f);
         [HideInInspector] public string saveSelectName = null;
 
-        public Transform inputXPosition;
-        private InputField inputXPositionOut;
-
-        public Transform inputYPosition;
-        private InputField inputYPositionOut;
-
-        public Transform inputZPosition;
-        private InputField inputZPositionOut;
-
         private Vector3 SavePosition = new Vector3(0f, 0f, 0f);
 
         private GameObject markerObject = null;
@@ -42,14 +33,8 @@ namespace nm
 
             markerObject = Instantiate(resourceM.GetPrefab("LabelPrefab"), positionSelected, Quaternion.Euler(0f, 0f, 0f));
             markerObject.SetActive(false);
-
-            inputXPositionOut = inputXPosition.GetComponent<InputField>();
-            inputYPositionOut = inputYPosition.GetComponent<InputField>();
-            inputZPositionOut = inputZPosition.GetComponent<InputField>();
         }
 
-        // Если честно, то мне самому страшно на это смотреть. 
-        // Слава богу, что эта операция происходит не в Update.
         public void UpdatePosition()
         {
             if (saveSelectName != null && targetObject.position != positionSelected)

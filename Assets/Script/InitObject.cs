@@ -12,7 +12,7 @@ namespace nm
         private void Start()
         {
             Instance = this;
-            parentSimple = new GameObject("TestSimple").transform;
+            //parentSimple = new GameObject("TestSimple").transform;
 
             resourceM = ResourceManager.GetInstance();
         }
@@ -23,39 +23,39 @@ namespace nm
         public Vector3 scaleLGraph = new Vector3(0.2f, 0.2f, 0.2f);
         public Vector3 scaleLink = new Vector3(0.05f, 0.05f, 0.05f);
 
-        Transform parentSimple;
+        //Transform parentSimple;
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // БОЛЬШАЯ ЧАСТЬ ЭТОГО КОДА ПОЙДЁТ В МУСОРКУ. ОСТАВИМ ТОЛЬКО ИНИЦИАЛИЗАЦИИ ДЛЯ КЛАССОВ.
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        public void Create()
-        {
-            string line;
-            System.IO.StreamReader file = new System.IO.StreamReader(Application.dataPath + "/Save/simple.txt");
-            while ((line = file.ReadLine()) != null)
-            {
-                String[] words = line.Split(new char[] { ',', '(', ')', '[', ']', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (words[0] == "#") continue;
-                if (words[0] == "GRAPH")
-                {
-                    InitGraph(new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
-                        new Color32(byte.Parse(words[5]), byte.Parse(words[6]), byte.Parse(words[7]), 128), words[1], parentSimple);
-                }
-                if (words[0] == "LGRAPH")
-                {
-                    InitLine(true, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
-                        new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
-                        new Color32(byte.Parse(words[8]), byte.Parse(words[9]), byte.Parse(words[10]), 128), words[1], parentSimple);
-                }
-                if (words[0] == "LINK")
-                {
-                    InitLine(false, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
-                        new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
-                        new Color32(0, 0, 0, 128), words[1], parentSimple);
-                }
-            }
-            file.Close();
-        }
+        //public void Create()
+        //{
+        //    string line;
+        //    System.IO.StreamReader file = new System.IO.StreamReader(Application.dataPath + "/Save/simple.txt");
+        //    while ((line = file.ReadLine()) != null)
+        //    {
+        //        String[] words = line.Split(new char[] { ',', '(', ')', '[', ']', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        //        if (words[0] == "#") continue;
+        //        if (words[0] == "GRAPH")
+        //        {
+        //            InitGraph(new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
+        //                new Color32(byte.Parse(words[5]), byte.Parse(words[6]), byte.Parse(words[7]), 128), words[1], parentSimple);
+        //        }
+        //        if (words[0] == "LGRAPH")
+        //        {
+        //            InitLine(true, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
+        //                new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
+        //                new Color32(byte.Parse(words[8]), byte.Parse(words[9]), byte.Parse(words[10]), 128), words[1], parentSimple);
+        //        }
+        //        if (words[0] == "LINK")
+        //        {
+        //            InitLine(false, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
+        //                new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
+        //                new Color32(0, 0, 0, 128), words[1], parentSimple);
+        //        }
+        //    }
+        //    file.Close();
+        //}
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         public GameObject InitGraph(Vector3 position, Color32 color, string _name, Transform parent = null)

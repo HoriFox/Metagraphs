@@ -43,9 +43,11 @@ namespace nm
 
         public void ReadCode(string content)
         {
+            SceneCleaning.Instance.Clean();
+            structureM.NewStructure();
+
             lastLoadCompleted = false;
             reservedContent = content;
-            SceneCleaning.Instance.Clean();
             string input = content.Replace(" ", string.Empty);
             input = input.Replace("\t", string.Empty);
             input = input.Replace("\n", string.Empty);
@@ -54,7 +56,6 @@ namespace nm
             string pattern = "(" + String.Join("|", delimiters.Select(d => Regex.Escape(d)).ToArray()) + ")";
             string[] result = Regex.Split(input, pattern);
 
-            structureM.NewStructure();
             ReadAllSctor(result);
         }
 

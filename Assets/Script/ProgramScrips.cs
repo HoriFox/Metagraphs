@@ -29,7 +29,7 @@ namespace nm
         // Загрузка конфигурации.
         public void LoadConfiguration()
         {
-            GetComponent<LoadSaveDialog>().showDialogLoadConfiguration = true;
+            GetComponent<LoadSaveDialog>().showDialogLoadJSON = true;
         }
         // Назад.
         public void Backward()

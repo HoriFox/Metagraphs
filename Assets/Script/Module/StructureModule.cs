@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.IO;
+//using System.Text.RegularExpressions;
 
 namespace nm
 {
@@ -21,6 +22,9 @@ namespace nm
         public string End = null;
         public string TypeValue = null;
         public string Value = null;
+
+        public string[] ParentStructuresKeys;
+        public string[] ChildStructuresKeys;
 
         // Дополняется с помощью специальной функции после чтения. Соединяем созданные в структуре объекты.
         [NonSerialized] public Dictionary<string, Structure> ParentStructures = new Dictionary<string, Structure>();
@@ -42,11 +46,17 @@ namespace nm
 
     public class StructureModule : MonoBehaviour
     {
+        [HideInInspector] public PredicateModule predicateM;
         private static StructureModule init;
 
         private void Awake()
         {
             init = this;
+        }
+
+        private void Start()
+        {
+            predicateM = PredicateModule.GetInit();
         }
 
         public static StructureModule GetInit()
@@ -64,20 +74,39 @@ namespace nm
         // Загрузка из JSON.
         public void LoadingJson(string path)
         {
-            try
+            SceneCleaning.Instance.Clean();
+            NewStructure();
+            using (StreamReader sr = new StreamReader(path))
             {
-                using (StreamReader sr = new StreamReader(path))
+                string json = sr.ReadLine();
+                Structure[] structureArr = JsonHelper.FromJson<Structure>(json);
+                foreach (var part in structureArr)
                 {
-                    string json = sr.ReadLine();
-                    Structure structure = JsonUtility.FromJson<Structure>(json);
-                    Debug.Log(structure.Name);
+                    structure[part.Name] = part;
                 }
             }
-            catch (Exception e)
+            foreach (var part in structure)
             {
-                Debug.LogError("The file could not be read:");
-                Debug.LogError(e.Message);
+                foreach (var parent in part.Value.ParentStructuresKeys)
+                {
+                    part.Value.ParentStructures.Add(parent, structure[parent]);
+                }
+                foreach (var child in part.Value.ChildStructuresKeys)
+                {
+                    part.Value.ChildStructures.Add(child, structure[child]);
+                }
+                // Поправить как-нибудь. TO DO
+                // При десериализации null становится empty.
+                if (part.Value.Start == string.Empty)
+                {
+                    part.Value.Start = null;
+                }
+                if (part.Value.End == string.Empty)
+                {
+                    part.Value.End = null;
+                }
             }
+            predicateM.BuildGraphs();
         }
 
         // Выгрузка в JSON.
@@ -85,11 +114,30 @@ namespace nm
         {
             using (StreamWriter stream = new StreamWriter(path))
             {
-                foreach (var child in structure) // Нужно сделать нормальный стандартный вывод массива JSON. TO DO
+                Structure[] structureArr = new Structure[structure.Count];
+
+                int i = 0;
+                foreach (var childStructure in structure)
                 {
-                    string json = JsonUtility.ToJson(child.Value);
-                    stream.Write(json);
+                    childStructure.Value.ParentStructuresKeys = new string[childStructure.Value.ParentStructures.Count];
+                    int p = 0;
+                    foreach (var parent in childStructure.Value.ParentStructures)
+                    {
+                        childStructure.Value.ParentStructuresKeys[p] = parent.Key;
+                        p++;
+                    }
+                    childStructure.Value.ChildStructuresKeys = new string[childStructure.Value.ChildStructures.Count];
+                    int c = 0;
+                    foreach (var child in childStructure.Value.ChildStructures)
+                    {
+                        childStructure.Value.ChildStructuresKeys[c] = child.Key;
+                        c++;
+                    }
+                    structureArr[i] = childStructure.Value;
+                    i++;
                 }
+                string json = JsonHelper.ToJson(structureArr);
+                stream.Write(json);
             }
         }
 
