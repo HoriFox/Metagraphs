@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace nm
@@ -76,34 +75,50 @@ namespace nm
             childList.Add(m_currentStructure.End);
 
             int i = 0;
+            bool firstNull = false;
             foreach (var part in childList)
             {
-                // Если последний элемент.
-                if ((i + 1) == childList.Count)
+                if (firstNull)
                 {
-                    // Значит End есть.
-                    if (part != null)
-                    {
-                        if (m_currentStructure.Eo)
-                        {
-                            Chain += (" --> " + part);
-                        }
-                        else
-                        {
-                            Chain += (" --- " + part);
-                        }
-                    }
+                    firstNull = false;
+                    Chain += part;
                 }
                 else
                 {
-                    // Первый элемент.
-                    if (i != 0)
+                    // Если последний элемент.
+                    if ((i + 1) == childList.Count)
                     {
-                        Chain += (" --- " + part);
+                        // Значит End есть.
+                        if (part != null)
+                        {
+                            if (m_currentStructure.Eo)
+                            {
+                                Chain += (" --> " + part);
+                            }
+                            else
+                            {
+                                Chain += (" --- " + part);
+                            }
+                        }
                     }
                     else
                     {
-                        Chain += part;
+                        // Первый элемент.
+                        if (i >= 1)
+                        {
+                            Chain += (" --- " + part);
+                        }
+                        else
+                        {
+                            if (part != null)
+                            {
+                                Chain += part;
+                            }
+                            else
+                            {
+                                firstNull = true;
+                            }
+                        }
                     }
                 }
                 i++;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+
 namespace nm
 {
     public class LogicModule : MonoBehaviour
@@ -40,11 +41,32 @@ namespace nm
             return init;
         }
 
-        public void LogicAdd()
+        public void LogicAdd() // TO DO
         {
             foreach(var part in structureM.structure)
             {
                 part.Value.position = new Vector3(UnityEngine.Random.Range(-1.18f, 1.18f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(0f, 4f));
+            }
+        }
+
+        public void LogicAdd(string nameNode) // TO DO
+        {
+            Dictionary<string, Structure> childList = structureM.GetChild(nameNode);
+            foreach (var part in childList)
+            {
+                part.Value.position = new Vector3(UnityEngine.Random.Range(-1.18f, 1.18f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(0f, 4f));
+            }
+        }
+
+        public void LogicAdd2D(string nameNode) // TO DO
+        {
+            Dictionary<string, Structure> childList = structureM.GetChild(nameNode);
+            Vector3 oldVector = structureM.structure[nameNode].position;
+            structureM.structure[nameNode].Radius = 4;
+
+            foreach (var part in childList)
+            {
+                part.Value.position = new Vector3(oldVector.x + UnityEngine.Random.Range(-1f, 1f), oldVector.y, oldVector.z + UnityEngine.Random.Range(-1f, 1f));
             }
         }
 

@@ -94,7 +94,8 @@ namespace nm
             public void Create()
             {
                 Vector3 position = m_structure.GetPosition();
-                // Если альфа канал 0, то цвет не установлен. TO DO
+                Vector3 size = new Vector3(0.5f, 0.5f, 0.5f);
+                // Если альфа канал 0, то цвет не установлен.
                 if (m_structure.color.a == 0)
                 {
                     SetColor(new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255));
@@ -102,19 +103,30 @@ namespace nm
 
                 if (m_structure.ChildStructures != null && m_structure.ChildStructures.Count >= 1)
                 {
-                    // Вершина-связь.
-                    foreach (var part in m_structure.ChildStructures)
+                    // Стандартное, 3D представление вершины или графа.
+                    if (m_structure.StyleVisualization == null || m_structure.StyleVisualization == "3D")
                     {
-                        // Не делаем связь с Edge и MetaEdge
-                        if (part.Value.ObjectType == "Edge" || part.Value.ObjectType == "Metaedge") continue;
-                        Vector3 childPosition = part.Value.GetPosition();
-                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(true, position, childPosition, m_structure.color, Name));
+                        // Вершина-связь.
+                        foreach (var part in m_structure.ChildStructures)
+                        {
+                            // Не делаем связь с Edge и MetaEdge
+                            if (part.Value.Static) continue;
+                            Vector3 childPosition = part.Value.GetPosition();
+                            m_structure.gameObject.AddRange(InitObject.Instance.InitLine(true, position, childPosition, m_structure.color, Name));
+                        }
+                    }
+                    // 2D представление вершины или графа.
+                    else if (m_structure.StyleVisualization == "2D")
+                    {
+                        float radius = (float)m_structure.Radius;
+                        size = new Vector3(radius, 0.005f, radius); // TO DO
+                        m_structure.gameObject.Add(InitObject.Instance.InitGraph(position, size, m_structure.color, Name, Style3D:false));
                     }
                 }
                 else
                 {
                     // Вершина-сфера.
-                    m_structure.gameObject.Add(InitObject.Instance.InitGraph(position, m_structure.color, Name));
+                    m_structure.gameObject.Add(InitObject.Instance.InitGraph(position, size, m_structure.color, Name));
                 }
             }
             public void SetColor(Color32 colorNew)
@@ -146,7 +158,7 @@ namespace nm
             }
             public void Create()
             {
-                // Проверка через одно место. Если альфа канал 0, то цвет не установлен. TO DO
+                // Если альфа канал 0, то цвет не установлен. 
                 if (m_structure.color.a == 0)
                 {
                     SetColor(new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255));

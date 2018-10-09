@@ -6,13 +6,20 @@ namespace nm
 {
     public class ProgramScrips : MonoBehaviour
     {
-        EditorMenu em;
-        FreeCamera fc;
+        EditorMenu editorMenu;
+        FreeCamera freeCamera;
+
+        private StructureModule structureM;
+
+        private void Start()
+        {
+            structureM = StructureModule.GetInit();
+        }
 
         void Awake()
         {
-            em = GameObject.Find("Menu").GetComponent<EditorMenu>();
-            fc = GameObject.Find("Camera").GetComponent<FreeCamera>();
+            editorMenu = GameObject.Find("Menu").GetComponent<EditorMenu>();
+            freeCamera = Camera.main.GetComponent<FreeCamera>();
         }
 
         // Сохранение.
@@ -30,6 +37,13 @@ namespace nm
         public void LoadConfiguration()
         {
             GetComponent<LoadSaveDialog>().showDialogLoadJSON = true;
+        }
+        // Очистка.
+        public void Clear()
+        {
+            SceneCleaning.Instance.Clean();
+            ChangeTransform.Instance.ResetChangeTransform();
+            structureM.NewStructure();
         }
         // Назад.
         public void Backward()
@@ -66,17 +80,17 @@ namespace nm
         // Показать настройки.
         public void ShowAbout()
         {
-            if (!em.menuActive && !fc.m_inputCaptured)
+            if (!editorMenu.menuActive && !freeCamera.m_inputCaptured)
             {
-                em.ShowAbout();
+                editorMenu.ShowAbout();
             }
         }
         // Показать настройки.
         public void ShowSetting()
         {
-            if (!em.fail && !em.menuActive && !fc.m_inputCaptured)
+            if (!editorMenu.fail && !editorMenu.menuActive && !freeCamera.m_inputCaptured)
             {
-                em.Show();
+                editorMenu.Show();
             }
         }
         // Выйти из приложения.

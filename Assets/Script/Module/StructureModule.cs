@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.IO;
-//using System.Text.RegularExpressions;
 
 namespace nm
 {
@@ -22,6 +20,10 @@ namespace nm
         public string End = null;
         public string TypeValue = null;
         public string Value = null;
+
+        public bool Static = false;
+        public string StyleVisualization = "3D";
+        public float? Radius = null;
 
         public string[] ParentStructuresKeys;
         public string[] ChildStructuresKeys;

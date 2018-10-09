@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 namespace nm
 {
@@ -36,8 +35,8 @@ namespace nm
         private RectTransform arrowRT;
         private RectTransform boxRT;
 
-        FreeCamera fc;
-        EditorMenu em;
+        FreeCamera freeCamera;
+        EditorMenu editorMenu;
 
         void Awake()
         {
@@ -58,8 +57,8 @@ namespace nm
                 bg.color = BGColorFade;
             }
             boxText.color = textColorFade;
-            fc = GameObject.Find("Camera").GetComponent<FreeCamera>();
-            em = GameObject.Find("Menu").GetComponent<EditorMenu>();
+            freeCamera = Camera.main.GetComponent<FreeCamera>();
+            editorMenu = GameObject.Find("Menu").GetComponent<EditorMenu>();
             //boxText.alignment = TextAnchor.MiddleCenter;
         }
 
@@ -94,7 +93,7 @@ namespace nm
 
             float arrowShift = width / 4; // сдвиг позиции стрелки по Х
 
-            if ((show || isUI) && !fc.m_inputCaptured && !em.menuActive)
+            if ((show || isUI) && !freeCamera.m_inputCaptured && !editorMenu.menuActive)
             {
                 float arrowPositionY = -(arrowRT.sizeDelta.y / 2 - 1); // позиция стрелки по умолчанию (внизу)
                 float arrowPositionX = arrowShift;

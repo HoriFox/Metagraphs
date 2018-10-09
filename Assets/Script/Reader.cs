@@ -35,6 +35,7 @@ namespace nm
 
         public void ReloadCode()
         {
+            ChangeTransform.Instance.ResetChangeTransform();
             if (reservedContent != null && lastLoadCompleted)
             {
                 engineM.ReadAndBuild(reservedContent);
@@ -152,8 +153,12 @@ namespace nm
                             nowLevel--; // Понижаем уровень скобок.
                             structureM.AddNodeData(nowNameNode, nowType);
                             structureM.AddEnvironment(nowNameNode, childNames: namesChild);
+                            // Если это рёбра, то это статические объекты. Другими словами, самостоятельные.
+                            if (nowType == "Edge" || nowType == "Metaedge")
+                            {
+                                structureM.structure[nowNameNode].Static = true;
+                            }
                             return new KeyValuePair<string, int>(nowNameNode, nowSector + 1);
-
                         case "Vertex":
                         case "Metavertex":
                         case "Edge":

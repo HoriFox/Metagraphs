@@ -42,13 +42,6 @@ namespace nm
         private int resolutions_id;
         private int quality_id;
 
-        GameObject fc;
-
-        void Awake()
-        {
-            fc = GameObject.Find("Camera");
-        }
-
         void Start()
         {
             // Определяем разрешение и качество.
@@ -324,20 +317,20 @@ namespace nm
         public void ResetMenuActive()
         {
             menuActive = false;
-            fc.GetComponent<FreeCamera>().UpdateMouseSetting();
-            fc.GetComponent<SuperBlur>().enabled = false;
+            Camera.main.GetComponent<FreeCamera>().UpdateMouseSetting();
+            Camera.main.GetComponent<SuperBlur>().enabled = false;
         }
 
         public void ShowAbout()
         {
-            fc.GetComponent<SuperBlur>().enabled = true;
+            Camera.main.GetComponent<SuperBlur>().enabled = true;
             aboutMenu.SetActive(true);
             menuActive = true;
         }
 
         public void Show()
         {
-            fc.GetComponent<SuperBlur>().enabled = true;
+            Camera.main.GetComponent<SuperBlur>().enabled = true;
             startMenu.SetActive(true);
             menuActive = true;
         }

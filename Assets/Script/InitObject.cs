@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 namespace nm
 {
@@ -58,12 +56,13 @@ namespace nm
         //}
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        public GameObject InitGraph(Vector3 position, Color32 color, string _name, Transform parent = null)
+        public GameObject InitGraph(Vector3 position, Vector3 _scale, Color32 _color, string _name, Transform parent = null, bool Style3D = true)
         {
-            GameObject objectVar;
             Transform parentUse = parent ?? parentStandart;
-            objectVar = Instantiate(resourceM.GetPrefab("GraphPrefab"), position, Quaternion.identity, parentUse).gameObject;
-            objectVar.GetComponent<Renderer>().material.color = color;
+            string namePrefabObject = (Style3D) ? "GraphPrefab" : "2DVertexPrefab";
+            GameObject objectVar = Instantiate(resourceM.GetPrefab(namePrefabObject), position, Quaternion.identity, parentUse).gameObject;
+            objectVar.transform.localScale = _scale;
+            objectVar.GetComponent<Renderer>().material.color = _color;
             objectVar.name = _name;
             objectVar.GetComponentInParent<TooltipText>().text = _name;
             return objectVar;

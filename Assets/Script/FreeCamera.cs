@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace nm
 {
@@ -14,34 +16,48 @@ namespace nm
         public float smoothness = 0.36f;
 
         [HideInInspector] public bool m_inputCaptured;
+        [HideInInspector] public bool m_rotateAroud;
         float m_yaw, m_pitch, speed, forward, right, up;
+
+        public Vector3 offset;
+        public float zoom = 0.2f;
+        public float zoomMax = 10;
+        public float zoomMin = 3;
 
         public Camera _camera;
         [HideInInspector] public string selectedObject = null;
         public GameObject changeTransformMenu;
+        public GameObject rotAObject;
+        public GameObject scrollBarRotA;
+        public Transform CenterRotMarker;
 
+        private Scrollbar speedRotate;
+        private Vector3 targetPosition;
+        private Quaternion standartZero = Quaternion.Euler(Vector3.zero);
         private StructureModule structureM;
-
-        Quaternion rotation;
-        EditorMenu em;
+        private Quaternion rotation;
+        private EditorMenu editorMenu;
 
         void Awake()
         {
-            em = GameObject.Find("Menu").GetComponent<EditorMenu>();
+            editorMenu = GameObject.Find("Menu").GetComponent<EditorMenu>();
         }
 
         private void Start()
         {
             structureM = StructureModule.GetInit();
+            offset = new Vector3(offset.x, offset.y, Mathf.Abs(zoomMin));
+
+            speedRotate = scrollBarRotA.GetComponent<Scrollbar>();
         }
 
         public void UpdateMouseSetting()
         {
-            mouseTurnSpeed = em.mouseSensitivity;
-            smoothness = em.smoothingMotion;
+            mouseTurnSpeed = editorMenu.mouseSensitivity;
+            smoothness = editorMenu.smoothingMotion;
         }
 
-        // Режим полёта.
+        // Вернули управление.
         void CaptureInput()
         {
             Cursor.visible = false;
@@ -53,7 +69,7 @@ namespace nm
             m_pitch = transform.eulerAngles.x;
         }
 
-        // Режим изучения.
+        // Забрали управление.
         void ReleaseInput()
         {
             Cursor.visible = true;
@@ -70,7 +86,7 @@ namespace nm
 
         void Update()
         {
-            if (!m_inputCaptured)
+            if (!m_inputCaptured && !m_rotateAroud)
             {
                 RaycastHit hit;
                 Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
@@ -81,35 +97,80 @@ namespace nm
 
                     if (Input.GetMouseButtonDown(0))
                     {
-                        //Debug.Log(objectHit.name);
-
-                        if (structureM.IsExistNode(objectHit.name))
+                        // Если луч указывает на UI элемент, то показания луча недействительны.
+                        if (EventSystem.current.IsPointerOverGameObject()) return;
+                        // Если элемент существует, а так же он не статический (не Edge и Metaedge).
+                        if (structureM.IsExistNode(objectHit.name) && !structureM.structure[objectHit.name].Static)
                         {
                             selectedObject = objectHit.name;
                             changeTransformMenu.SetActive(true);
-                        }
-                        else
-                        {
-                            if (objectHit.tag != "CustomTransform")
-                            {
-                                selectedObject = null;
-                                changeTransformMenu.SetActive(false);
-                            }
                         }
                     }
                 }
             }
 
-            if (Input.GetMouseButtonDown(1) && !em.menuActive)
+            if (!editorMenu.menuActive)
             {
-                if (!m_inputCaptured)
+                if (Input.GetMouseButtonDown(1))
                 {
-                    CaptureInput();
+                    if (!m_rotateAroud)
+                    {
+                        if (!m_inputCaptured)
+                        {
+                            CaptureInput();
+                        }
+                        else if (m_inputCaptured)
+                        {
+                            ReleaseInput();
+                        }
+                    }
                 }
-                else if (m_inputCaptured)
+
+                // При нажатии показываем маркер центра.
+                if (Input.GetKeyDown(EditorMenu.keys[7]))
                 {
-                    ReleaseInput();
+                    CenterRotMarker.gameObject.SetActive(true);
                 }
+
+                // При вращении или удерживании кнопки можно настроить дальность.
+                if (m_rotateAroud || Input.GetKey(EditorMenu.keys[7]))
+                {
+                    CenterRotMarker.position = targetPosition;
+                    CenterRotMarker.rotation = standartZero;
+
+                    if (Input.GetAxis("Mouse ScrollWheel") > 0)
+                    {
+                        offset.z += zoom;
+                    }
+                    else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+                    {
+                        offset.z -= zoom;
+                    }
+                    offset.z = Mathf.Clamp(offset.z, Mathf.Abs(zoomMin), Mathf.Abs(zoomMax));
+                }
+
+                // В момент отпускания мы убираем метку центра.
+                if (Input.GetKeyUp(EditorMenu.keys[7]))
+                {
+                    CenterRotMarker.gameObject.SetActive(false);
+                    if (!m_inputCaptured)
+                    {
+                        m_rotateAroud = (m_rotateAroud) ? false : true;
+                        rotAObject.SetActive(m_rotateAroud);
+                    }
+                }
+            }
+
+            //Debug.DrawLine(transform.position, targetPosition);
+
+            if (m_rotateAroud)
+            {
+                transform.Rotate(Vector3.up * Time.deltaTime * 100 * speedRotate.value);
+                transform.position = transform.localRotation * -offset + targetPosition;
+            }
+            else
+            {
+                targetPosition = transform.position + transform.localRotation * offset;
             }
 
             if (!m_inputCaptured)
@@ -122,8 +183,6 @@ namespace nm
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, smoothness);
 
             // Перемещение камеры
-            //forward = speed * Input.GetAxis("Vertical");
-            //right = speed * Input.GetAxis("Horizontal");
             speed = Time.deltaTime * (Input.GetKey(EditorMenu.keys[6]) ? sprintSpeed : moveSpeed);
             right = speed * ((Input.GetKey(EditorMenu.keys[1]) ? 1f : 0f) - (Input.GetKey(EditorMenu.keys[0]) ? 1f : 0f));
             forward = speed * ((Input.GetKey(EditorMenu.keys[2]) ? 1f : 0f) - (Input.GetKey(EditorMenu.keys[3]) ? 1f : 0f));

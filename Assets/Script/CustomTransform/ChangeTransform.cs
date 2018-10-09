@@ -7,10 +7,16 @@ namespace nm
 {
     public class ChangeTransform : MonoBehaviour
     {
-        private FreeCamera freeC;
+        public static ChangeTransform Instance;
+
+        private FreeCamera freeCamera;
         private StructureModule structureM;
         private PredicateModule predicateM;
 
+        public Transform visualStyleToggle;
+        private Toggle visualStyle;
+
+        [HideInInspector] public LogicModule logicM;
         [HideInInspector] public ResourceManager resourceM;
         [HideInInspector] public Vector3 positionSelected = new Vector3(0f, 0f, 0f);
         [HideInInspector] public string saveSelectName = null;
@@ -22,11 +28,15 @@ namespace nm
 
         private void Awake()
         {
-            freeC = Camera.main.GetComponent<FreeCamera>();
+            Instance = this;
+            freeCamera = Camera.main.GetComponent<FreeCamera>();
         }
 
         private void Start()
         {
+            visualStyle = visualStyleToggle.GetComponent<Toggle>();
+
+            logicM = LogicModule.GetInit();
             structureM = StructureModule.GetInit();
             predicateM = PredicateModule.GetInit();
             resourceM = ResourceManager.GetInstance();
@@ -35,30 +45,56 @@ namespace nm
             markerObject.SetActive(false);
         }
 
-        public void UpdatePosition()
+        public void UpdateInformation() // TO DO
         {
+            bool rebuild = false;
+            string visualStyleStr = (visualStyle.isOn) ? "3D" : "2D";
+
+            if (visualStyleStr == "3D")
+            {
+                targetObject.StyleVisualization = visualStyleStr;
+                logicM.LogicAdd(targetObject.Name);
+                rebuild = true;
+            }
+
+            if (visualStyleStr == "2D")
+            {
+                targetObject.StyleVisualization = visualStyleStr;
+                logicM.LogicAdd2D(targetObject.Name);
+                rebuild = true;
+            }
+
             if (saveSelectName != null && targetObject.position != positionSelected)
             {
                 targetObject.position = positionSelected;
-
-                // Пересоздаём всех детей.
-                foreach (var part in targetObject.ChildStructures)
-                {
-                    DeleteObject(part.Value.gameObject);
-                    predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
-                }
-
-                // Пересоздаём всех родителей.
-                foreach (var part in targetObject.ParentStructures)
-                {
-                    DeleteObject(part.Value.gameObject);
-                    predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
-                }
-
-                // Пересоздаём себя.
-                DeleteObject(targetObject.gameObject);
-                predicateM.TactBuild(saveSelectName, targetObject.ObjectType);
+                rebuild = true;
             }
+
+            if (rebuild)
+            {
+                RebuildObject();
+            }
+        }
+
+        private void RebuildObject()
+        {
+            // Пересоздаём всех детей.
+            foreach (var part in targetObject.ChildStructures)
+            {
+                DeleteObject(part.Value.gameObject);
+                predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
+            }
+
+            // Пересоздаём всех родителей.
+            foreach (var part in targetObject.ParentStructures)
+            {
+                DeleteObject(part.Value.gameObject);
+                predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
+            }
+
+            // Пересоздаём себя.
+            DeleteObject(targetObject.gameObject);
+            predicateM.TactBuild(saveSelectName, targetObject.ObjectType);
         }
 
         private void DeleteObject(List<GameObject> gameObject)
@@ -75,8 +111,8 @@ namespace nm
         public void ResetChangeTransform()
         {
             saveSelectName = null;
-            freeC.selectedObject = null;
-            freeC.changeTransformMenu.SetActive(false);
+            freeCamera.selectedObject = null;
+            freeCamera.changeTransformMenu.SetActive(false);
             markerObject.SetActive(false);
             positionSelected = new Vector3(0f, 0f, 0f);
         }
@@ -107,14 +143,15 @@ namespace nm
                 }
             }
             // Одноразовое включение заселекченного объекта.
-            if (saveSelectName != freeC.selectedObject)
+            if (saveSelectName != freeCamera.selectedObject)
             {
-                saveSelectName = freeC.selectedObject;
+                saveSelectName = freeCamera.selectedObject;
                 if (saveSelectName != null)
                 {
                     targetObject = structureM.structure[saveSelectName];
                     markerObject.transform.position = targetObject.GetPosition();
                     markerObject.SetActive(true);
+                    visualStyle.isOn = (targetObject.StyleVisualization == "3D") ? true : false;
                 }
                 else
                 {
