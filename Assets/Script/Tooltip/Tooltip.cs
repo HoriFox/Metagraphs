@@ -38,7 +38,7 @@ namespace nm
         FreeCamera freeCamera;
         EditorMenu editorMenu;
 
-        void Awake()
+        private void Awake()
         {
             borderAround = border * 2;
             img = new Image[2];
@@ -62,7 +62,7 @@ namespace nm
             //boxText.alignment = TextAnchor.MiddleCenter;
         }
 
-        void LateUpdate()
+        private void LateUpdate()
         {
             bool show = false;
             boxText.fontSize = fontSize;
