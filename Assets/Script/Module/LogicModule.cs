@@ -45,7 +45,7 @@ namespace nm
         {
             foreach(var part in structureM.structure)
             {
-                part.Value.position = new Vector3(UnityEngine.Random.Range(-1.18f, 1.18f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(0f, 4f));
+                part.Value.position = new Vector3(UnityEngine.Random.Range(0f, 5f), UnityEngine.Random.Range(1f, 6f), UnityEngine.Random.Range(0f, 5f));
             }
         }
 
@@ -54,7 +54,7 @@ namespace nm
             Dictionary<string, Structure> childList = structureM.GetChild(nameNode);
             foreach (var part in childList)
             {
-                part.Value.position = new Vector3(UnityEngine.Random.Range(-1.18f, 1.18f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(0f, 4f));
+                part.Value.position = new Vector3(UnityEngine.Random.Range(0f, 5f), UnityEngine.Random.Range(1f, 6f), UnityEngine.Random.Range(0f, 5f));
             }
         }
 

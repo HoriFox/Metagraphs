@@ -15,6 +15,7 @@ namespace nm
 
         public Transform visualStyleToggle;
         private Toggle visualStyle;
+        private bool isChangedStyle = false;
 
         [HideInInspector] public LogicModule logicM;
         [HideInInspector] public ResourceManager resourceM;
@@ -50,18 +51,27 @@ namespace nm
             bool rebuild = false;
             string visualStyleStr = (visualStyle.isOn) ? "3D" : "2D";
 
-            if (visualStyleStr == "3D")
+            if (targetObject.StyleVisualization != visualStyleStr)
             {
-                targetObject.StyleVisualization = visualStyleStr;
-                logicM.LogicAdd(targetObject.Name);
-                rebuild = true;
+                isChangedStyle = true;
             }
 
-            if (visualStyleStr == "2D")
+            if (isChangedStyle)
             {
-                targetObject.StyleVisualization = visualStyleStr;
-                logicM.LogicAdd2D(targetObject.Name);
-                rebuild = true;
+                if (visualStyleStr == "3D")
+                {
+                    targetObject.StyleVisualization = visualStyleStr;
+                    logicM.LogicAdd(targetObject.Name);
+                    rebuild = true;
+                }
+
+                if (visualStyleStr == "2D")
+                {
+                    targetObject.StyleVisualization = visualStyleStr;
+                    logicM.LogicAdd2D(targetObject.Name);
+                    rebuild = true;
+                }
+                isChangedStyle = false;
             }
 
             if (saveSelectName != null && targetObject.position != positionSelected)
@@ -152,6 +162,7 @@ namespace nm
                     markerObject.transform.position = targetObject.GetPosition();
                     markerObject.SetActive(true);
                     visualStyle.isOn = (targetObject.StyleVisualization == "3D") ? true : false;
+                    isChangedStyle = false;
                 }
                 else
                 {

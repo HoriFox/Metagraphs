@@ -164,34 +164,73 @@ namespace nm
                     SetColor(new Color32((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255));
                 }
 
-                Vector3 firstPosition = Vector3.zero;
-                Vector3 secondPosition = Vector3.zero;
+                // TO DO. Больше тестов!
+                if (m_structure.ChildStructures.Count > 0)
+                {
+                    int n = 0;
+                    Vector3 lastPosition = Vector3.zero;
+                    Vector3 nextPosition = Vector3.zero;
 
-                if (m_structure.Start != null && m_structure.End != null)
-                {
-                    firstPosition = m_structureDict[m_structure.Start].GetPosition();
-                    secondPosition = m_structureDict[m_structure.End].GetPosition();
-                }
-                else
-                {
-                    if (m_structure.ChildStructures.Count == 2)
+                    if (m_structure.Start != null && m_structure.End != null && m_structure.ChildStructures.Count == 2)
                     {
-                        int k = 0;
-                        foreach (var part in m_structure.ChildStructures)
+                        //Debug.Log("1 способ");
+                        Vector3 firstPosition = m_structureDict[m_structure.Start].GetPosition();
+                        Vector3 secondPosition = m_structureDict[m_structure.End].GetPosition();
+                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, firstPosition, secondPosition, m_structure.color, Name));
+                    }
+                    else 
+                    if (m_structure.ChildStructures.Count > 1)
+                    {
+                        if (m_structure.Start != null && m_structure.End != null)
                         {
-                            if (k == 0)
+                            //Debug.Log("2 способ");
+                            foreach (var part in m_structure.ChildStructures)
                             {
-                                firstPosition = part.Value.GetPosition();
+                                if (n == 0)
+                                {
+                                    lastPosition = m_structureDict[m_structure.Start].GetPosition();
+                                    n++;
+                                    continue;
+                                }
+
+                                if (part.Key != m_structure.Start && part.Key != m_structure.End)
+                                {
+                                    nextPosition = m_structureDict[part.Key].GetPosition();
+                                }
+                                else
+                                {
+                                    n++;
+                                    continue;
+                                }
+
+                                m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, lastPosition, nextPosition, m_structure.color, Name));
+                                lastPosition = nextPosition;
+                                n++;
                             }
-                            if (k == 1)
+
+                            nextPosition = m_structureDict[m_structure.End].GetPosition();
+                            m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, lastPosition, nextPosition, m_structure.color, Name));
+                        }
+                        else
+                        {
+                            //Debug.Log("3 способ");
+                            foreach (var part in m_structure.ChildStructures)
                             {
-                                secondPosition = part.Value.GetPosition();
+                                if (n == 0)
+                                {
+                                    lastPosition = m_structureDict[part.Key].GetPosition();
+                                    n++;
+                                    continue;
+                                }
+
+                                nextPosition = m_structureDict[part.Key].GetPosition();
+                                m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, lastPosition, nextPosition, m_structure.color, Name));
+                                lastPosition = nextPosition;
+                                n++;
                             }
-                            k++;
                         }
                     }
                 }
-                m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, firstPosition, secondPosition, m_structure.color, Name));
             }
             public void SetColor(Color32 colorNew)
             {

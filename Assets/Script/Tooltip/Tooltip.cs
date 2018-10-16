@@ -35,6 +35,13 @@ namespace nm
         private RectTransform arrowRT;
         private RectTransform boxRT;
 
+        private float arrowPositionY;
+        private float arrowPositionX;
+        private float currentZ;
+        private float curY;
+        private float curX;
+        private bool right;
+
         FreeCamera freeCamera;
         EditorMenu editorMenu;
 
@@ -59,7 +66,6 @@ namespace nm
             boxText.color = textColorFade;
             freeCamera = Camera.main.GetComponent<FreeCamera>();
             editorMenu = GameObject.Find("Menu").GetComponent<EditorMenu>();
-            //boxText.alignment = TextAnchor.MiddleCenter;
         }
 
         private void LateUpdate()
@@ -76,49 +82,82 @@ namespace nm
                     TooltipText tooltiptext = hit.transform.GetComponent<TooltipText>();
                     text = tooltiptext.text;
                     arrayShow = tooltiptext.arrayShow;
-                    //if (tooltiptext.active)
                     show = true;
                 }
             }
 
             boxText.text = text;
-            //box.SetActive(active);
             arrow.SetActive(arrayShow);
             float width = maxWidth;
-            // Если ширина текста соотвествует максимальной ширине.
-            if (boxText.preferredWidth <= maxWidth - borderAround) width = boxText.preferredWidth + borderAround;
-            // Если финальная ширина меньше минимальной ширины.
-            if (width < minWidth) width = minWidth;
-            boxRT.sizeDelta = new Vector2(width, boxText.preferredHeight + borderAround);
 
-            float arrowShift = width / 4; // сдвиг позиции стрелки по Х
+            if (boxText.preferredWidth <= maxWidth - borderAround)
+            {
+                width = boxText.preferredWidth + borderAround;
+            }
+
+            // Ограничиватель. 
+            width = Mathf.Clamp(width, minWidth, maxWidth);
+
+            boxRT.sizeDelta = new Vector2(width, boxText.preferredHeight + borderAround);
 
             if ((show || isUI) && !freeCamera.m_inputCaptured && !editorMenu.menuActive)
             {
-                float arrowPositionY = -(arrowRT.sizeDelta.y / 2 - 1); // позиция стрелки по умолчанию (внизу)
-                float arrowPositionX = arrowShift;
+                arrowPositionY = 0;
+                arrowPositionX = 0;
+                currentZ = 0;
+                right = false;
+                curY = Input.mousePosition.y + boxRT.sizeDelta.y + arrowRT.sizeDelta.y / 4f;
+                curX = Input.mousePosition.x + boxRT.sizeDelta.x + arrowRT.sizeDelta.x / 4f;
 
-                float curY = Input.mousePosition.y + boxRT.sizeDelta.y / 2 + arrowRT.sizeDelta.y;
-                Vector3 arrowScale = new Vector3(1, 1, 1);
-                if (curY + boxRT.sizeDelta.y / 2 > Screen.height) // если Tooltip выходит за рамки экрана, в данном случаи по высоте
+                // Если Tooltip выходит за рамки экрана по ширине.
+                if (curX > Screen.width)
                 {
-                    curY = Input.mousePosition.y - boxRT.sizeDelta.y / 2 - arrowRT.sizeDelta.y;
-                    arrowPositionY = boxRT.sizeDelta.y + (arrowRT.sizeDelta.y / 2 - 1);
-                    arrowScale = new Vector3(1, -1, 1); // отражение по вертикале
+                    right = true;
+                    arrowPositionX = boxRT.sizeDelta.x;
+                }
+                // Если Tooltip выходит за рамки экрана по высоте.
+                if (curY > Screen.height)
+                {
+                    arrowPositionY = boxRT.sizeDelta.y;
+                    if (right)
+                    {
+                        // Верхний правый
+                        currentZ = 315f;
+                        curX -= (boxRT.sizeDelta.x + boxRT.sizeDelta.x / 2f + arrowRT.sizeDelta.x / 2f);
+                        curY -= (boxRT.sizeDelta.y + arrowRT.sizeDelta.y + arrowRT.sizeDelta.y / 2f);
+                    }
+                    else
+                    {
+                        // Верхний левый
+                        currentZ = 45f;
+                        curX -= boxRT.sizeDelta.x / 2f;
+                        curY -= (boxRT.sizeDelta.y + boxRT.sizeDelta.y / 2f + arrowRT.sizeDelta.y / 2f);
+                    }
+                }
+                else
+                {
+                    if (right)
+                    {
+                        // Нижний правый
+                        currentZ = 225f;
+                        curX -= (boxRT.sizeDelta.x + boxRT.sizeDelta.x / 2f + arrowRT.sizeDelta.x / 2f);
+                        curY -= boxRT.sizeDelta.y / 2f;
+
+                    }
+                    else
+                    {
+                        // Нижний левый
+                        currentZ = 135f;
+                        curX -= boxRT.sizeDelta.x / 2f;
+                        curY -= boxRT.sizeDelta.y / 2f;
+                    }
                 }
 
-                float curX = Input.mousePosition.x + arrowShift;
-                if (curX + boxRT.sizeDelta.x / 2 > Screen.width)
-                {
-                    curX = Input.mousePosition.x - arrowShift;
-                    arrowPositionX = width - arrowShift;
-                }
-
-                boxRT.anchoredPosition = new Vector2(curX, curY);
-
+                boxRT.anchoredPosition = new Vector2(curX , curY);
                 arrowRT.anchoredPosition = new Vector2(arrowPositionX, arrowPositionY);
-                arrowRT.localScale = arrowScale;
+                arrowRT.localRotation = Quaternion.Euler(0f, 0f, currentZ);
 
+                // Появиться.
                 foreach (Image bg in img)
                 {
                     bg.color = Color.Lerp(bg.color, BGColor, speed * Time.deltaTime);
@@ -127,6 +166,7 @@ namespace nm
             }
             else
             {
+                // Исчезнуть.
                 foreach (Image bg in img)
                 {
                     bg.color = Color.Lerp(bg.color, BGColorFade, speed * Time.deltaTime);
