@@ -124,7 +124,7 @@ namespace nm
                         // Верхний правый
                         currentZ = 315f;
                         curX -= (boxRT.sizeDelta.x + boxRT.sizeDelta.x / 2f + arrowRT.sizeDelta.x / 2f);
-                        curY -= (boxRT.sizeDelta.y + arrowRT.sizeDelta.y + arrowRT.sizeDelta.y / 2f);
+                        curY -= (boxRT.sizeDelta.y + boxRT.sizeDelta.y / 2f + arrowRT.sizeDelta.y / 2f);
                     }
                     else
                     {
