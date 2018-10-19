@@ -84,6 +84,12 @@ namespace nm
                 ReleaseInput();
         }
 
+        public void SetAlignment()
+        {
+            Vector3 currentRotation = Camera.main.transform.localRotation.eulerAngles;
+            Camera.main.transform.localRotation = Quaternion.Euler(Vector3.up);
+        }
+
         void Update()
         {
             if (!m_inputCaptured && !m_rotateAroud)
@@ -146,7 +152,7 @@ namespace nm
                     {
                         offset.z -= zoom;
                     }
-                    offset.z = Mathf.Clamp(offset.z, Mathf.Abs(zoomMin), Mathf.Abs(zoomMax));
+                    offset.z = Mathf.Clamp(offset.z, Mathf.Abs(zoomMin), float.MaxValue);
                 }
 
                 // В момент отпускания мы убираем метку центра.

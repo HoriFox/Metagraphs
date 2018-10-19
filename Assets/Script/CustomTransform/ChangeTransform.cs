@@ -13,6 +13,7 @@ namespace nm
         private StructureModule structureM;
         private PredicateModule predicateM;
 
+        public Text coordinates;
         public Transform visualStyleToggle;
         private Toggle visualStyle;
         private bool isChangedStyle = false;
@@ -31,6 +32,11 @@ namespace nm
         {
             Instance = this;
             freeCamera = Camera.main.GetComponent<FreeCamera>();
+        }
+
+        public static ChangeTransform GetInit()
+        {
+            return Instance;
         }
 
         private void Start()
@@ -82,29 +88,52 @@ namespace nm
 
             if (rebuild)
             {
-                RebuildObject();
+                RebuildObject("rebuild");
             }
         }
 
-        private void RebuildObject()
+        private void RebuildObject(string typeRebuild, string name = null)
         {
+            Structure target;
+            if (name != null)
+            {
+                target = structureM.structure[name];
+            }
+            else
+            {
+                target = targetObject;
+            }
+
             // Пересоздаём всех детей.
-            foreach (var part in targetObject.ChildStructures)
+            foreach (var part in target.ChildStructures)
             {
                 DeleteObject(part.Value.gameObject);
-                predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
+                if (typeRebuild == "rebuild")
+                {
+                    predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
+                }
             }
 
             // Пересоздаём всех родителей.
-            foreach (var part in targetObject.ParentStructures)
+            foreach (var part in target.ParentStructures)
             {
                 DeleteObject(part.Value.gameObject);
+                if (typeRebuild == "delete")
+                {
+                    part.Value.ChildStructures.Remove(target.Name);
+                }
                 predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
             }
 
-            // Пересоздаём себя.
-            DeleteObject(targetObject.gameObject);
-            predicateM.TactBuild(saveSelectName, targetObject.ObjectType);
+            DeleteObject(target.gameObject);
+            if (typeRebuild == "delete")
+            {
+                structureM.structure.Remove(target.Name);
+            }
+            if (typeRebuild == "rebuild")
+            {
+                predicateM.TactBuild(saveSelectName, target.ObjectType);
+            }
         }
 
         private void DeleteObject(List<GameObject> gameObject)
@@ -127,24 +156,28 @@ namespace nm
             positionSelected = new Vector3(0f, 0f, 0f);
         }
 
+        public void DeleteObject(string name = null)
+        {
+            RebuildObject("delete", name);
+            ResetChangeTransform();
+        }
+
         void Update()
         {
             if (markerObject != null)
             {
-                if (markerObject.transform.localPosition.x != SavePosition.x)
+                Transform transformMarker = markerObject.transform;
+                coordinates.text = transformMarker.localPosition.ToString();
+
+                if (transformMarker.localPosition != SavePosition)
                 {
-                    SavePosition.x = markerObject.transform.localPosition.x;
-                    positionSelected.x = SavePosition.x;
+                    SavePosition = transformMarker.localPosition;
+                    positionSelected = SavePosition;
                 }
-                if (markerObject.transform.localPosition.y != SavePosition.y)
+
+                if (Input.GetKeyDown(KeyCode.Delete))
                 {
-                    SavePosition.y = markerObject.transform.localPosition.y;
-                    positionSelected.y = SavePosition.y;
-                }
-                if (markerObject.transform.localPosition.z != SavePosition.z)
-                {
-                    SavePosition.z = markerObject.transform.localPosition.z;
-                    positionSelected.z = SavePosition.z;
+                    DeleteObject();
                 }
 
                 if (Input.GetKeyDown(KeyCode.Escape))

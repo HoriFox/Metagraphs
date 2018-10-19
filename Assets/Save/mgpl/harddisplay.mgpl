@@ -1,0 +1,12 @@
+Metavertex	(
+	Name=BlockOne,
+	v1, v2, v3, v4
+),
+Metavertex	(
+	Name=BlockOTwo,
+	v11, v21, v31, v41
+),
+Metavertex	(
+	Name=BlockThree,
+	v12, v22, v32, v42
+),

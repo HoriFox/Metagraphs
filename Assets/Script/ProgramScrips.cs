@@ -8,6 +8,7 @@ namespace nm
     {
         EditorMenu editorMenu;
         FreeCamera freeCamera;
+        public GameObject GUIObject;
 
         private StructureModule structureM;
 
@@ -61,22 +62,22 @@ namespace nm
         public void MakeScreenShot()
         {
             Debug.Log("Скриншот");
-            StartCoroutine("Capture");
+            StartCoroutine("CaptureScreen");
         }
-        Texture2D screenCap;
-        // Куратина скриншота.
-        IEnumerator Capture()
+
+        // TO DO Не успевает обработать скриншот и оставляет GUI
+        public int screenshotQuality = 1;
+
+        public IEnumerator CaptureScreen()
         {
-            screenCap = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-
+            yield return null;
+            GUIObject.SetActive(false);
             yield return new WaitForEndOfFrame();
-            screenCap.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
-            screenCap.Apply();
-
-            byte[] bytes = screenCap.EncodeToPNG();
             string timeAndData = System.DateTime.Now.ToString("hh-mm-ss MM-dd-yyyy");
-            File.WriteAllBytes(Application.dataPath + "/Screenshot/" + timeAndData + ".png", bytes);
+            ScreenCapture.CaptureScreenshot(Application.dataPath + "/Screenshot/" + timeAndData + ".png"/*, screenshotQuality*/);
+            GUIObject.SetActive(true);
         }
+
         // Показать настройки.
         public void ShowAbout()
         {

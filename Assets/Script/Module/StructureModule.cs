@@ -10,6 +10,7 @@ namespace nm
     public class Structure
     {
         public string Name = null;
+        public string Description = null;
         public Vector3 position;
         public Vector3 rotationEuler;
         public Color32 color = new Color32(0, 0, 0, 0);
@@ -73,6 +74,15 @@ namespace nm
             structure = new Dictionary<string, Structure>();
         }
 
+        //public void Shift()
+        //{
+        //    foreach(var part in structure)
+        //    {
+        //        if (part.Value.ObjectType == "Metavertex")
+        //            part.Value.position += new Vector3(-4.5f, 0f, -6f);
+        //    }
+        //}
+
         // Загрузка из JSON.
         public void LoadingJson(string path)
         {
@@ -80,7 +90,10 @@ namespace nm
             NewStructure();
             using (StreamReader sr = new StreamReader(path))
             {
-                string json = sr.ReadLine();
+                string json = sr.ReadToEnd();
+                json = json.Replace("\t", string.Empty);
+                json = json.Replace("\n", string.Empty);
+                json = json.Replace("\r", string.Empty);
                 Structure[] structureArr = JsonHelper.FromJson<Structure>(json);
                 foreach (var part in structureArr)
                 {
@@ -99,6 +112,10 @@ namespace nm
                 }
                 // Поправить как-нибудь. TO DO
                 // При десериализации null становится empty.
+                if (part.Value.Description == string.Empty)
+                {
+                    part.Value.Description = null;
+                }
                 if (part.Value.Start == string.Empty)
                 {
                     part.Value.Start = null;
@@ -138,7 +155,7 @@ namespace nm
                     structureArr[i] = childStructure.Value;
                     i++;
                 }
-                string json = JsonHelper.ToJson(structureArr);
+                string json = JsonHelper.ToJson(structureArr, true);
                 stream.Write(json);
             }
         }
