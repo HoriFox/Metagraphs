@@ -35,7 +35,7 @@ namespace nm
 
         public void ReloadCode()
         {
-            ChangeTransform.Instance.ResetChangeTransform();
+            ChangeModule.Instance.ResetChange();
             if (reservedContent != null && lastLoadCompleted)
             {
                 engineM.ReadAndBuild(reservedContent);

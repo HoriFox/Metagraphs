@@ -43,7 +43,7 @@ namespace nm
         public void Clear()
         {
             SceneCleaning.Instance.Clean();
-            ChangeTransform.Instance.ResetChangeTransform();
+            ChangeModule.Instance.ResetChange();
             structureM.NewStructure();
         }
         // Назад.

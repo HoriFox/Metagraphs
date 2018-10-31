@@ -11,16 +11,22 @@ namespace nm
         private string Name = null;
         private Dictionary<string, Structure> m_currentStructureDict;
         private Structure m_currentStructure;
-        private static OutlogModule init;
+        private static OutlogModule Instance;
+        private StructureModule structureM;
 
         private void Awake()
         {
-            init = this;
+            Instance = this;
+        }
+
+        private void Start()
+        {
+            structureM = StructureModule.GetInit();
         }
 
         public static OutlogModule GetInit()
         {
-            return init;
+            return Instance;
         }
 
         public void ConsoleLog(string name, ref Dictionary<string, Structure> structure, string objectType = "Vertex")
@@ -161,13 +167,22 @@ namespace nm
             }
         }
 
-        public void OutTooltip(string customOutput = null)
+        public void OutTooltip(string customOutput = null, string currentName = null)
         {
+            List<GameObject> currentStructure = null;
             if (customOutput != null)
             {
                 output = customOutput;
             }
-            foreach (var childPart in m_currentStructure.gameObject)
+            if (currentName != null)
+            {
+                currentStructure = structureM.structure[currentName].gameObject;
+            }
+            else
+            {
+                currentStructure = m_currentStructure.gameObject;
+            }
+            foreach (var childPart in currentStructure)
             {
                 childPart.transform.GetComponentInParent<TooltipText>().text = output;
             }

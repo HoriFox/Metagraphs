@@ -64,28 +64,33 @@ namespace nm
             objectVar.transform.localScale = _scale;
             objectVar.GetComponent<Renderer>().material.color = _color;
             objectVar.name = _name;
-            objectVar.GetComponentInParent<TooltipText>().text = _name;
+            objectVar.GetComponent<TooltipText>().text = _name;
+            
+            objectVar.GetComponentInChildren<TextMesh>().text = _name;
+            // Расчёт степени контрастности и соответствующего цвета.
+            objectVar.GetComponentInChildren<TextMesh>().color = (_color.r * 0.299 + _color.g * 0.587 + _color.b * 0.114 <= 140) ? Color.white : Color.black;
+
             return objectVar;
         }
 
         public List<GameObject> InitLine(bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, Color32 color, string _name, Transform parent = null)
         {
             Transform parentUse = parent ?? parentStandart;
-            List<GameObject> gameObjects = CreateLine(isLGraph, positionFirst, positionSecond, color, parentUse);
+            List<GameObject> gameObjects = CreateLine(isLGraph, positionFirst, positionSecond, color, _name, parentUse);
             foreach (var part in gameObjects)
             {
                 part.name = _name;
-                part.GetComponentInParent<TooltipText>().text = _name;
+                part.GetComponent<TooltipText>().text = _name;
             }
             return gameObjects;
         }
 
-        private List<GameObject> CreateLine(bool isLGraph, Vector3 firstPoint, Vector3 secondPoint, Color32 color, Transform parent)
+        private List<GameObject> CreateLine(bool isLGraph, Vector3 firstPoint, Vector3 secondPoint, Color32 color, string _name, Transform parent)
         {
             List<GameObject> gameObjects = new List<GameObject>();
             gameObjects.Add(InitSphere(isLGraph, firstPoint, color, parent));
             gameObjects.Add(InitSphere(isLGraph, secondPoint, color, parent));
-            gameObjects.Add(InitLine(isLGraph, gameObjects[0].transform.position, gameObjects[1].transform.position, color, parent));
+            gameObjects.Add(InitOneLine(isLGraph, gameObjects[0].transform.position, gameObjects[1].transform.position, color, _name, parent));
             return gameObjects;
         }
         private GameObject InitSphere(bool isLGraph, Vector3 point, Color32 color, Transform parent)
@@ -94,10 +99,11 @@ namespace nm
             sphere = SetProperties(isLGraph, sphere, color);
             return sphere;
         }
-        private GameObject InitLine(bool isLGraph, Vector3 beginPoint, Vector3 endPoint, Color32 color, Transform parent)
+        private GameObject InitOneLine(bool isLGraph, Vector3 beginPoint, Vector3 endPoint, Color32 color, string _name, Transform parent)
         {
             GameObject line = Instantiate(resourceM.GetPrefab("LinePrefab"), Vector3.zero, Quaternion.identity, parent);
             line = SetProperties(isLGraph, line, color);
+            //line.GetComponentInChildren<TextMesh>().text = _name;
             UpdateLinePosition(line, beginPoint, endPoint);
             return line;
         }

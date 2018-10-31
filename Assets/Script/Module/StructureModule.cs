@@ -16,7 +16,6 @@ namespace nm
         public Color32 color = new Color32(0, 0, 0, 0);
         public string ObjectType = null;
         public bool Eo = false;
-        public bool Metatype = false;
         public string Start = null;
         public string End = null;
         public string TypeValue = null;
@@ -50,11 +49,11 @@ namespace nm
     public class StructureModule : MonoBehaviour
     {
         [HideInInspector] public PredicateModule predicateM;
-        private static StructureModule init;
+        private static StructureModule Instance;
 
         private void Awake()
         {
-            init = this;
+            Instance = this;
         }
 
         private void Start()
@@ -64,7 +63,7 @@ namespace nm
 
         public static StructureModule GetInit()
         {
-            return init;
+            return Instance;
         }
 
         public Dictionary<string, Structure> structure = new Dictionary<string, Structure>();
@@ -197,7 +196,7 @@ namespace nm
             if (!IsExistNode(name)) return;
             if (objectType != null)
             {
-                structure[name].Metatype = (objectType.Substring(0, 4) == "Meta") ? true : false;
+                //structure[name].Metatype = (objectType.Substring(0, 4) == "Meta") ? true : false;
                 structure[name].ObjectType = objectType;
             }
             if (eo != null)

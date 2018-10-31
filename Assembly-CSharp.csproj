@@ -61,8 +61,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Script\CustomTransform\ChangeTransform.cs" />
-    <Compile Include="Assets\Script\CustomTransform\CTransform.cs" />
     <Compile Include="Assets\Script\DebugSctipts\FPSDisplay.cs" />
     <Compile Include="Assets\Script\EditObject.cs" />
     <Compile Include="Assets\Script\EditorMenu.cs" />
@@ -72,11 +70,16 @@
     <Compile Include="Assets\Script\InputFieldFocus.cs" />
     <Compile Include="Assets\Script\JsonHelper.cs" />
     <Compile Include="Assets\Script\LoadSaveDialog.cs" />
+    <Compile Include="Assets\Script\LookTextName.cs" />
     <Compile Include="Assets\Script\Manager\ResourceManager.cs" />
+    <Compile Include="Assets\Script\Module\ChangeModule.cs" />
+    <Compile Include="Assets\Script\Module\CTransform.cs" />
+    <Compile Include="Assets\Script\Module\GUIChangeModule.cs" />
     <Compile Include="Assets\Script\Module\LogicModule.cs" />
     <Compile Include="Assets\Script\Module\OutlogModule.cs" />
     <Compile Include="Assets\Script\Module\PredicateModule.cs" />
     <Compile Include="Assets\Script\Module\StructureModule.cs" />
+    <Compile Include="Assets\Script\Outline.cs" />
     <Compile Include="Assets\Script\ProgramScrips.cs" />
     <Compile Include="Assets\Script\Reader.cs" />
     <Compile Include="Assets\Script\SceneCleaning.cs" />
@@ -87,8 +90,10 @@
     <Compile Include="Assets\Script\Tooltip\TooltipText.cs" />
     <Compile Include="Assets\Script\Tooltip\TooltipTextUI.cs" />
     <None Include="Assets\EditorSettings.xml" />
+    <None Include="Assets\Shader\OutlineFill.shader" />
     <None Include="Assets\Save\simple.txt" />
     <None Include="Assets\Shader\SuperBlurUI.shader" />
+    <None Include="Assets\Shader\OutlineMask.shader" />
     <None Include="Assets\Shader\SuperBlurPostEffect.shader" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Администратор/Desktop/Представление метаграфов/Metagraphs/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>

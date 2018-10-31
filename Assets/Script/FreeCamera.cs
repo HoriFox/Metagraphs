@@ -24,9 +24,8 @@ namespace nm
         public float zoomMax = 10;
         public float zoomMin = 3;
 
-        public Camera _camera;
+        public GameObject menu;
         [HideInInspector] public string selectedObject = null;
-        public GameObject changeTransformMenu;
         public GameObject rotAObject;
         public GameObject scrollBarRotA;
         public Transform CenterRotMarker;
@@ -35,17 +34,15 @@ namespace nm
         private Vector3 targetPosition;
         private Quaternion standartZero = Quaternion.Euler(Vector3.zero);
         private StructureModule structureM;
+        private ChangeModule changeM;
         private Quaternion rotation;
         private EditorMenu editorMenu;
 
-        void Awake()
-        {
-            editorMenu = GameObject.Find("Menu").GetComponent<EditorMenu>();
-        }
-
         private void Start()
         {
+            editorMenu = menu.GetComponent<EditorMenu>();
             structureM = StructureModule.GetInit();
+            changeM = ChangeModule.GetInit();
             offset = new Vector3(offset.x, offset.y, Mathf.Abs(zoomMin));
 
             speedRotate = scrollBarRotA.GetComponent<Scrollbar>();
@@ -95,7 +92,7 @@ namespace nm
             if (!m_inputCaptured && !m_rotateAroud)
             {
                 RaycastHit hit;
-                Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
                 if (Physics.Raycast(ray, out hit))
                 {
@@ -105,11 +102,12 @@ namespace nm
                     {
                         // Если луч указывает на UI элемент, то показания луча недействительны.
                         if (EventSystem.current.IsPointerOverGameObject()) return;
-                        // Если элемент существует, а так же он не статический (не Edge и Metaedge).
-                        if (structureM.IsExistNode(objectHit.name) && !structureM.structure[objectHit.name].Static)
+                        // Если элемент существует
+                        if (structureM.IsExistNode(objectHit.name))
                         {
+                            changeM.ResetChange();
                             selectedObject = objectHit.name;
-                            changeTransformMenu.SetActive(true);
+                            changeM.SetChangeMenu(selectedObject);
                         }
                     }
                 }

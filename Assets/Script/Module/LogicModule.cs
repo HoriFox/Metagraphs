@@ -22,11 +22,11 @@ namespace nm
         }
         Dictionary<int, GameObject> objectGame = new Dictionary<int, GameObject>();
         private StructureModule structureM;
-        private static LogicModule init;
+        private static LogicModule Instance;
 
         private void Awake()
         {
-            init = this;
+            Instance = this;
         }
 
         private void Start()
@@ -38,7 +38,7 @@ namespace nm
 
         public static LogicModule GetInit()
         {
-            return init;
+            return Instance;
         }
 
         public void LogicAdd() // TO DO
