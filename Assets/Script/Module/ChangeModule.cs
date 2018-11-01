@@ -172,7 +172,7 @@ namespace nm
             gameObject.Clear();
         }
 
-        public void SetChangeMenu(string name)
+        public void ShowChangeMenu(string name)
         {
             changeInformation.SetActive(true);
             //Если элемент не статический (не Edge и Metaedge).

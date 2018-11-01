@@ -10,13 +10,18 @@ namespace nm
     {
         private StructureModule structureM;
         private ChangeModule changeM;
-        private OutlogModule outlogM;
+        //private OutlogModule outlogM;
         private static GUIChangeModule init;
 
         public Text nameTarget;
         public Text typeTarget;
+        public Toggle oeToggle;
+        public InputField nameStart;
+        public InputField nameEnd;
         public Dropdown typeEnvironment;
-        public Text nameEnvironment;
+        public InputField nameEnvironment;
+        public Transform scrollViewParent;
+        public Transform scrollViewChild;
 
         private void Awake()
         {
@@ -26,7 +31,7 @@ namespace nm
         private void Start()
         {
             structureM = StructureModule.GetInit();
-            outlogM = OutlogModule.GetInit();
+            //outlogM = OutlogModule.GetInit();
             changeM = ChangeModule.GetInit();
         }
 
@@ -95,6 +100,12 @@ namespace nm
             nameTarget.text = changeM.saveSelectName;
             Structure structure = structureM.structure[changeM.saveSelectName];
             typeTarget.text = structure.ObjectType;
+            ScrollViewHelper viewHelperParent = scrollViewParent.GetComponent<ScrollViewHelper>();
+            ScrollViewHelper viewHelperChild = scrollViewChild.GetComponent<ScrollViewHelper>();
+            viewHelperParent.ResetList();
+            viewHelperChild.ResetList();
+            viewHelperParent.ShowList(structureM.structure[changeM.saveSelectName].ParentStructuresKeys);
+            viewHelperChild.ShowList(structureM.structure[changeM.saveSelectName].ChildStructuresKeys);
         }
 
         public void UpdateInformation()

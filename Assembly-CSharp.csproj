@@ -83,6 +83,7 @@
     <Compile Include="Assets\Script\ProgramScrips.cs" />
     <Compile Include="Assets\Script\Reader.cs" />
     <Compile Include="Assets\Script\SceneCleaning.cs" />
+    <Compile Include="Assets\Script\ScrollViewHelper.cs" />
     <Compile Include="Assets\Script\SuperBlur\SuperBlur.cs" />
     <Compile Include="Assets\Script\SuperBlur\SuperBlurBase.cs" />
     <Compile Include="Assets\Script\TextTextureModule.cs" />

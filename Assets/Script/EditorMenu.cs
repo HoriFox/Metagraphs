@@ -21,7 +21,7 @@ namespace nm
         public GameObject startMenu;
         public GameObject aboutMenu;
         public GameObject errorMenu;
-        public Transform hidePanel;
+        //public Transform hidePanel;
         public float defaultMouseSensitivity = 0.5f;
         public float defaultSmoothingMotion = 0.36f;
         public KeyCode[] defaultKeys = { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.E, KeyCode.Q, KeyCode.LeftShift };
@@ -319,19 +319,19 @@ namespace nm
         {
             menuActive = false;
             Camera.main.GetComponent<FreeCamera>().UpdateMouseSetting();
-            hidePanel.gameObject.SetActive(false);
+            //hidePanel.gameObject.SetActive(false);
         }
 
         public void ShowAbout()
         {
-            hidePanel.gameObject.SetActive(true);
+            //hidePanel.gameObject.SetActive(true);
             aboutMenu.SetActive(true);
             menuActive = true;
         }
 
         public void Show()
         {
-            hidePanel.gameObject.SetActive(true);
+            //hidePanel.gameObject.SetActive(true);
             startMenu.SetActive(true);
             menuActive = true;
         }

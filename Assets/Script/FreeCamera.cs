@@ -107,7 +107,7 @@ namespace nm
                         {
                             changeM.ResetChange();
                             selectedObject = objectHit.name;
-                            changeM.SetChangeMenu(selectedObject);
+                            changeM.ShowChangeMenu(selectedObject);
                         }
                     }
                 }
