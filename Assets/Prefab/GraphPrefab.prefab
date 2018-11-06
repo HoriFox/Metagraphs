@@ -20,7 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4605119706194154}
   - component: {fileID: 23371169417381460}
-  - component: {fileID: 114119286596960676}
+  - component: {fileID: 114309734532877472}
   - component: {fileID: 102070466185085500}
   m_Layer: 0
   m_Name: Name
@@ -173,7 +173,7 @@ TextMesh:
   m_Color:
     serializedVersion: 2
     rgba: 4278190080
---- !u!114 &114119286596960676
+--- !u!114 &114309734532877472
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}

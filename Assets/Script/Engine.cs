@@ -14,6 +14,8 @@ namespace nm
         [HideInInspector] public LogicModule logicM;
         [HideInInspector] public PredicateModule predicateM;
 
+        public int selectedAxis = -1;
+
         void Awake()
         {
             init = this;

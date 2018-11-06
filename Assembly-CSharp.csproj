@@ -61,6 +61,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Script\AutoText.cs" />
+    <Compile Include="Assets\Script\Axles.cs" />
     <Compile Include="Assets\Script\DebugSctipts\FPSDisplay.cs" />
     <Compile Include="Assets\Script\EditObject.cs" />
     <Compile Include="Assets\Script\EditorMenu.cs" />
@@ -70,7 +72,6 @@
     <Compile Include="Assets\Script\InputFieldFocus.cs" />
     <Compile Include="Assets\Script\JsonHelper.cs" />
     <Compile Include="Assets\Script\LoadSaveDialog.cs" />
-    <Compile Include="Assets\Script\LookTextName.cs" />
     <Compile Include="Assets\Script\Manager\ResourceManager.cs" />
     <Compile Include="Assets\Script\Module\ChangeModule.cs" />
     <Compile Include="Assets\Script\Module\CTransform.cs" />

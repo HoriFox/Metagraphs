@@ -72,7 +72,6 @@ namespace nm
         {
             bool show = false;
             boxText.fontSize = fontSize;
-
             RaycastHit hit;
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit))
@@ -173,6 +172,11 @@ namespace nm
                 }
                 boxText.color = Color.Lerp(boxText.color, textColorFade, speed * Time.deltaTime);
             }
+        }
+
+        public void ResetIsUI()
+        {
+            isUI = false;
         }
     }
 }

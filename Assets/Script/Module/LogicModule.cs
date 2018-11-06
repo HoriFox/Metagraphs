@@ -41,32 +41,31 @@ namespace nm
             return Instance;
         }
 
-        public void LogicAdd() // TO DO
+        public void LogicAdd(string nameNode = null) // TO DO
         {
-            foreach(var part in structureM.structure)
-            {
-                part.Value.position = new Vector3(UnityEngine.Random.Range(0f, 5f), UnityEngine.Random.Range(1f, 6f), UnityEngine.Random.Range(0f, 5f));
-            }
-        }
+            Dictionary<string, Structure> childList = null;
+            childList = (nameNode != null) ? structureM.GetChild(nameNode) : structureM.structure;
 
-        public void LogicAdd(string nameNode) // TO DO
-        {
-            Dictionary<string, Structure> childList = structureM.GetChild(nameNode);
             foreach (var part in childList)
             {
-                part.Value.position = new Vector3(UnityEngine.Random.Range(0f, 5f), UnityEngine.Random.Range(1f, 6f), UnityEngine.Random.Range(0f, 5f));
+                // Если не Edge или Metaedge.
+                if (!part.Value.Static)
+                {
+                    part.Value.position = new Vector3[1];
+                    part.Value.position[0] = new Vector3(UnityEngine.Random.Range(0f, 5f), UnityEngine.Random.Range(1f, 6f), UnityEngine.Random.Range(0f, 5f));
+                }
             }
         }
 
         public void LogicAdd2D(string nameNode) // TO DO
         {
             Dictionary<string, Structure> childList = structureM.GetChild(nameNode);
-            Vector3 oldVector = structureM.structure[nameNode].position;
+            Vector3 oldVector = structureM.structure[nameNode].GetPosition(0);
             structureM.structure[nameNode].Radius = 4;
 
             foreach (var part in childList)
             {
-                part.Value.position = new Vector3(oldVector.x + UnityEngine.Random.Range(-1f, 1f), oldVector.y, oldVector.z + UnityEngine.Random.Range(-1f, 1f));
+                part.Value.position[0] = new Vector3(oldVector.x + UnityEngine.Random.Range(-1f, 1f), oldVector.y, oldVector.z + UnityEngine.Random.Range(-1f, 1f));
             }
         }
 

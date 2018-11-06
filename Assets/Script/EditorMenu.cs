@@ -22,7 +22,7 @@ namespace nm
         public GameObject aboutMenu;
         public GameObject errorMenu;
         //public Transform hidePanel;
-        public float defaultMouseSensitivity = 0.5f;
+        public float defaultMouseSensitivity = 0.36f;
         public float defaultSmoothingMotion = 0.36f;
         public KeyCode[] defaultKeys = { KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.E, KeyCode.Q, KeyCode.LeftShift };
         public Scrollbar SensitivityScrollbar;

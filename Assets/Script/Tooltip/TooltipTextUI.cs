@@ -5,7 +5,6 @@ namespace nm
 {
     public class TooltipTextUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-
         public string text;
         public bool arrayShow = false;
         //public bool active = true;

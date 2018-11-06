@@ -93,7 +93,7 @@ namespace nm
             }
             public void Create()
             {
-                Vector3 position = m_structure.GetPosition();
+                Vector3 position = m_structure.GetPosition(0);
                 Vector3 size = new Vector3(0.5f, 0.5f, 0.5f);
                 // Если альфа канал 0, то цвет не установлен.
                 if (m_structure.color.a == 0)
@@ -111,7 +111,7 @@ namespace nm
                         {
                             // Не делаем связь с Edge и MetaEdge
                             if (part.Value.Static) continue;
-                            Vector3 childPosition = part.Value.GetPosition();
+                            Vector3 childPosition = part.Value.GetPosition(0);
                             m_structure.gameObject.AddRange(InitObject.Instance.InitLine(true, position, childPosition, m_structure.color, Name));
                         }
                     }
@@ -165,71 +165,72 @@ namespace nm
                 }
 
                 // TO DO. Больше тестов!
+                // По концепции не может работать без детей. А просто выставлять доп. координаты бессмысленно.
                 if (m_structure.ChildStructures.Count > 0)
                 {
+                    List<Vector3> postionList = new List<Vector3>();                            //Создаём лист координатов, которые мы заполним, а потом и построим по ним.
+
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Композитор
+                    // Если есть направленная связь, то самое первое - начальный объект.
+                    if (m_structure.Eo)
+                    {
+                        postionList.Add(m_structureDict[m_structure.Start].GetPosition(0));
+                    }
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <<
+                    if (m_structure.position.Length == 0)
+                    {
+                        foreach (var part in m_structure.ChildStructures)
+                        {
+                            postionList.Add(part.Value.position[0]);
+                        }
+                    }
+                    else
+                    if (m_structure.position.Length > 0 && m_structure.ChildStructures.Count == 2) // TO DO. Связи между объектами и текущие дополнительные позиции.
+                    {
+                        int k = 0;
+                        // Плохой код.
+                        foreach (var part in m_structure.ChildStructures)
+                        {
+                            if (k == 0)
+                            {
+                                postionList.Add(part.Value.position[0]);
+                                postionList.AddRange(m_structure.position);
+                            }
+                            if (k == 1)
+                            {
+                                postionList.Add(part.Value.position[0]);
+                                break;
+                            }
+                            k++;
+                        }
+                    }
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <<
+                    // Если есть направленная связь, то самое последнее - конечный объект.
+                    if (m_structure.Eo)
+                    {
+                        postionList.Add(m_structureDict[m_structure.End].GetPosition(0));
+                    }
+
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Билдер
                     int n = 0;
                     Vector3 lastPosition = Vector3.zero;
                     Vector3 nextPosition = Vector3.zero;
 
-                    if (m_structure.Start != null && m_structure.End != null && m_structure.ChildStructures.Count == 2)
+                    foreach (var position in postionList)
                     {
-                        //Debug.Log("1 способ");
-                        Vector3 firstPosition = m_structureDict[m_structure.Start].GetPosition();
-                        Vector3 secondPosition = m_structureDict[m_structure.End].GetPosition();
-                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, firstPosition, secondPosition, m_structure.color, Name));
-                    }
-                    else 
-                    if (m_structure.ChildStructures.Count > 1)
-                    {
-                        if (m_structure.Start != null && m_structure.End != null)
+                        if (n == 0)
                         {
-                            //Debug.Log("2 способ");
-                            foreach (var part in m_structure.ChildStructures)
-                            {
-                                if (n == 0)
-                                {
-                                    lastPosition = m_structureDict[m_structure.Start].GetPosition();
-                                    n++;
-                                    continue;
-                                }
-
-                                if (part.Key != m_structure.Start && part.Key != m_structure.End)
-                                {
-                                    nextPosition = m_structureDict[part.Key].GetPosition();
-                                }
-                                else
-                                {
-                                    n++;
-                                    continue;
-                                }
-
-                                m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, lastPosition, nextPosition, m_structure.color, Name));
-                                lastPosition = nextPosition;
-                                n++;
-                            }
-
-                            nextPosition = m_structureDict[m_structure.End].GetPosition();
-                            m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, lastPosition, nextPosition, m_structure.color, Name));
+                            lastPosition = position;
+                            n++;
+                            continue;
                         }
-                        else
-                        {
-                            //Debug.Log("3 способ");
-                            foreach (var part in m_structure.ChildStructures)
-                            {
-                                if (n == 0)
-                                {
-                                    lastPosition = m_structureDict[part.Key].GetPosition();
-                                    n++;
-                                    continue;
-                                }
-
-                                nextPosition = m_structureDict[part.Key].GetPosition();
-                                m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, lastPosition, nextPosition, m_structure.color, Name));
-                                lastPosition = nextPosition;
-                                n++;
-                            }
-                        }
+                        nextPosition = position;
+                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, lastPosition, nextPosition, m_structure.color, Name));
+                        lastPosition = nextPosition;
+                        n++;
                     }
+
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 }
             }
             public void SetColor(Color32 colorNew)

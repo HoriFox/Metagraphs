@@ -12,6 +12,7 @@ namespace nm
 
         public void ShowList(string[] strList)
         {
+            if (strList == null) return;
             int k = 0;
             foreach (var part in strList)
             {

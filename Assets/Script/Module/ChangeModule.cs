@@ -105,9 +105,9 @@ namespace nm
                 isChangedStyle = false;
             }
 
-            if (saveSelectName != null && targetObject.position != positionSelected)
+            if (saveSelectName != null && targetObject.GetPosition(0) != positionSelected)
             {
-                targetObject.position = positionSelected;
+                targetObject.position[0] = positionSelected;
                 rebuild = true;
             }
 
@@ -243,7 +243,7 @@ namespace nm
                     targetObject = structureM.structure[saveSelectName];
                     if (!targetObject.Static)
                     {
-                        markerObject.transform.position = targetObject.GetPosition();
+                        markerObject.transform.position = targetObject.GetPosition(0);
                         markerObject.SetActive(true);
                         visualStyle.isOn = (targetObject.StyleVisualization == "3D") ? true : false;
                         isChangedStyle = false;

@@ -27,7 +27,7 @@ namespace nm
         {
             structureModule.AddNode(nameObject.text);
             string typeObject = null;
-            switch(typebject.value)
+            switch (typebject.value)
             {
                 case 0:
                     if (metabject.isOn)
@@ -43,7 +43,15 @@ namespace nm
                     break;
             }
             structureModule.AddNodeData(nameObject.text, typeObject);
+            SetStandartStartPosition();
             predicateModule.TactBuild(nameObject.text, typeObject);
+        }
+
+        private void SetStandartStartPosition()
+        {
+            var currentStructure = structureModule.structure[nameObject.text];
+            currentStructure.position = new Vector3[1];
+            currentStructure.position[0] = Vector3.zero;
         }
     }
 }
