@@ -42,7 +42,7 @@ namespace nm
                         typeObject = "Graph";
                     break;
             }
-            structureModule.AddNodeData(nameObject.text, typeObject);
+            structureModule.AddNodeData(nameObject.text, objectType: typeObject);
             SetStandartStartPosition();
             predicateModule.TactBuild(nameObject.text, typeObject);
         }
@@ -50,8 +50,8 @@ namespace nm
         private void SetStandartStartPosition()
         {
             var currentStructure = structureModule.structure[nameObject.text];
-            currentStructure.position = new Vector3[1];
-            currentStructure.position[0] = Vector3.zero;
+            currentStructure.Position = new Vector3[1];
+            currentStructure.Position[0] = Vector3.zero;
         }
     }
 }

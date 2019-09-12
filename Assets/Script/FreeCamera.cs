@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 namespace nm
 {
@@ -14,6 +15,11 @@ namespace nm
         public float mouseTurnSpeed = 0.5f;
         [Range(0f, 1f)]
         public float smoothness = 0.36f;
+
+        public float dragSpeed = 6f;
+
+        public Transform compass;
+        public Transform compassObject;
 
         [HideInInspector] public bool m_inputCaptured;
         [HideInInspector] public bool m_rotateAroud;
@@ -33,18 +39,21 @@ namespace nm
         private Scrollbar speedRotate;
         private Vector3 targetPosition;
         private Quaternion standartZero = Quaternion.Euler(Vector3.zero);
-        private StructureModule structureM;
-        private ChangeModule changeM;
+
+        private InteractionModule interactionM;
+
         private Quaternion rotation;
         private EditorMenu editorMenu;
 
+        private GUIStyle fpsStyle = new GUIStyle();
+
         private void Start()
         {
-            editorMenu = menu.GetComponent<EditorMenu>();
-            structureM = StructureModule.GetInit();
-            changeM = ChangeModule.GetInit();
-            offset = new Vector3(offset.x, offset.y, Mathf.Abs(zoomMin));
+            fpsStyle.alignment = TextAnchor.MiddleLeft;
 
+            editorMenu = menu.GetComponent<EditorMenu>();
+            interactionM = InteractionModule.GetInit();
+            offset = new Vector3(offset.x, offset.y, Mathf.Abs(zoomMin));
             speedRotate = scrollBarRotA.GetComponent<Scrollbar>();
         }
 
@@ -87,15 +96,39 @@ namespace nm
             Camera.main.transform.localRotation = Quaternion.Euler(Vector3.up);
         }
 
+        public Texture2D cursor1;
+
+        public static float ClampAngle(float angle, float min, float max)
+        {
+            if (angle < -360f)
+                angle += 360f;
+            if (angle > 360f)
+                angle -= 360f;
+            return Mathf.Clamp(angle, min, max);
+        }
+
+        private void FixedUpdate()
+        {
+            compassObject.rotation = Quaternion.Euler(transform.eulerAngles.x, 0, 0);
+            compass.localRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+        }
+
+        public float zoomSpeed = 2f;
+
         void Update()
         {
+
+            // Если у нас управление камерой и мы не крутимся.
             if (!m_inputCaptured && !m_rotateAroud)
             {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
+                // Если перед камерой объект.
                 if (Physics.Raycast(ray, out hit))
                 {
+                    //if (hit.collider.tag == "Metagraph")
+                    //{
                     Transform objectHit = hit.collider.transform;
 
                     if (Input.GetMouseButtonDown(0))
@@ -103,18 +136,39 @@ namespace nm
                         // Если луч указывает на UI элемент, то показания луча недействительны.
                         if (EventSystem.current.IsPointerOverGameObject()) return;
                         // Если элемент существует
-                        if (structureM.IsExistNode(objectHit.name))
+                        if (interactionM.IsExitObjectInStructure(objectHit.name))
                         {
-                            changeM.ResetChange();
-                            selectedObject = objectHit.name;
-                            changeM.ShowChangeMenu(selectedObject);
+                            if (interactionM.isConnection)
+                            {
+                                selectedObject = objectHit.name;
+                                interactionM.EndConnection();
+                            }
+                            else
+                            {
+                                //Debug.Log(objectHit.name);
+                                interactionM.SelectObjectAndOpenMenu(objectHit.name);
+                            }
                         }
+                        interactionM.DoubleTap("DoubleTapToObject");
+                    }
+                    //}
+                }
+                else
+                {
+                    // Если луч указывает на UI элемент, то показания луча недействительны.
+                    if (EventSystem.current.IsPointerOverGameObject()) return;
+
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        interactionM.DoubleTap("DoubleTapToNull");
                     }
                 }
             }
 
-            if (!editorMenu.menuActive)
+            // Если меню не активно.
+            if (!editorMenu.menuActive/* && !changeM.isPanelActive*/)
             {
+                //Right Mouse
                 if (Input.GetMouseButtonDown(1))
                 {
                     if (!m_rotateAroud)
@@ -135,6 +189,28 @@ namespace nm
                 {
                     CenterRotMarker.gameObject.SetActive(true);
                 }
+
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    //Left Mouse
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        Cursor.SetCursor(cursor1, Vector2.zero, CursorMode.Auto);
+                    }
+                    //Left Mouse
+                    if (Input.GetMouseButton(0))
+                    {
+                        transform.Translate(-Input.GetAxis("Mouse X") * dragSpeed, -Input.GetAxisRaw("Mouse Y") * dragSpeed, 0);
+                    }
+                    //Left Mouse
+                    if (Input.GetMouseButtonUp(0))
+                    {
+                        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+                    }
+                }
+
+                // Приближение и удаление с помощью колёсика
+                transform.Translate(0, 0, Input.GetAxis("Mouse ScrollWheel") * zoomSpeed, Space.Self);
 
                 // При вращении или удерживании кнопки можно настроить дальность.
                 if (m_rotateAroud || Input.GetKey(EditorMenu.keys[7]))
@@ -165,8 +241,6 @@ namespace nm
                 }
             }
 
-            //Debug.DrawLine(transform.position, targetPosition);
-
             if (m_rotateAroud)
             {
                 transform.Rotate(Vector3.up * Time.deltaTime * 100 * speedRotate.value);
@@ -182,7 +256,7 @@ namespace nm
 
             // Вращение камеры
             m_yaw = (m_yaw + mouseTurnSpeed * 10 * Input.GetAxis("Mouse X")) % 360f;
-            m_pitch = (m_pitch - mouseTurnSpeed * 10 * Input.GetAxis("Mouse Y")) % 360f;
+            m_pitch = ClampAngle((m_pitch - mouseTurnSpeed * 10 * Input.GetAxis("Mouse Y")) % 360f, -90f, 90f);
             rotation = Quaternion.AngleAxis(m_yaw, Vector3.up) * Quaternion.AngleAxis(m_pitch, Vector3.right);
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, smoothness);
 
@@ -194,5 +268,6 @@ namespace nm
             up = speed * ((Input.GetKey(EditorMenu.keys[4]) ? 1f : 0f) - (Input.GetKey(EditorMenu.keys[5]) ? 1f : 0f));
             transform.position += transform.forward * forward + transform.right * right + Vector3.up * up;
         }
+
     }
 }

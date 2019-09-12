@@ -5,7 +5,7 @@ namespace nm
 {
     public class OutlogModule : MonoBehaviour
     {
-        public bool active = true;
+        public bool ShowDebag = true;
 
         private string output = null;
         private string Name = null;
@@ -52,15 +52,16 @@ namespace nm
         private void OutLogVertexGraph()
         {
             string NameObject = m_currentStructure.ObjectType;
-            string Description = (m_currentStructure.Description != null) ? (" | Description: " + m_currentStructure.Description) : null;
+            string descCont = m_currentStructure.Description;
+            string Description = (descCont != null) ? (" | Description: " + m_currentStructure.Description) : null;
             output = "<b>" + NameObject + " |</b> Name: " + Name + Description;
-            if (active) Debug.Log(output);
+            if (ShowDebag) Debug.Log(output);
             if (m_currentStructure.ChildStructures != null && m_currentStructure.ChildStructures.Count != 0)
             {
                 output += "\nChildren:";
                 foreach (var child in m_currentStructure.ChildStructures)
                 {
-                    if (active) Debug.Log("\t └> " + child.Value.Name);
+                    if (ShowDebag) Debug.Log("\t └> " + child.Value.Name);
                     output += "\n" + child.Value.Name;
                 }
             }
@@ -130,16 +131,20 @@ namespace nm
                 }
                 i++;
             }
+
+            // " | EdgeDirection: " + m_currentStructure.Eo
+
             string NameObject = m_currentStructure.ObjectType;
-            string Description = (m_currentStructure.Description != null) ? (" | Description: " + m_currentStructure.Description) : null;
-            output = "<b>" + NameObject + " |</b> Name: " + Name + Description + " | EdgeDirection: " + m_currentStructure.Eo + " | <b>" + Chain + "</b>";
-            if (active) Debug.Log(output);
+            string descCont = m_currentStructure.Description;
+            string Description = (descCont != null) ? (" | Description: " + m_currentStructure.Description) : null;
+            output = "<b>" + NameObject + " |</b> Name: " + Name + Description + " | <b>" + Chain + "</b>";
+            if (ShowDebag) Debug.Log(output);
             if (m_currentStructure.ChildStructures != null && m_currentStructure.ChildStructures.Count != 0)
             {
                 output += "\nChildren:";
                 foreach (var child in m_currentStructure.ChildStructures)
                 {
-                    if (active) Debug.Log("\t └> " + child.Value.Name);
+                    if (ShowDebag) Debug.Log("\t └> " + child.Value.Name);
                     output += "\n" + child.Value.Name;
                 }
             }
@@ -147,13 +152,14 @@ namespace nm
 
         private void OutLogAttribute()
         {
-            string Description = (m_currentStructure.Description != null) ? (" | Description: " + m_currentStructure.Description) : null;
+            string descCont = m_currentStructure.Description;
+            string Description = (descCont != null) ? (" | Description: " + m_currentStructure.Description) : null;
             switch (m_currentStructure.TypeValue)
             {
                 case "int":
                 case "string":
                 case "pointer":
-                    if (active) Debug.Log("<b>Attribute |</b> Name: " + Name + Description + " | " + m_currentStructure.TypeValue + ": " + m_currentStructure.Value);
+                    if (ShowDebag) Debug.Log("<b>Attribute |</b> Name: " + Name + Description + " | " + m_currentStructure.TypeValue + ": " + m_currentStructure.Value);
                     break;
                 case "link":
                     string output = null;
@@ -162,7 +168,7 @@ namespace nm
                         Structure valueStructure = m_currentStructureDict[m_currentStructure.Value];
                         output = valueStructure.Value + " (" + valueStructure.ObjectType + ")";
                     }
-                    if (active) Debug.Log("<b>Attribute |</b> Name: " + Name + Description + " | " + output);
+                    if (ShowDebag) Debug.Log("<b>Attribute |</b> Name: " + Name + Description + " | " + output);
                     break;
             }
         }

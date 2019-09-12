@@ -11,7 +11,7 @@ namespace nm
     {
         public string Name = null;
         public string Description = null;
-        public Vector3[] position = null;
+        public Vector3[] Position = null;
         public Color32 color = new Color32(0, 0, 0, 0);
         public string ObjectType = null;
         public bool Eo = false;
@@ -20,8 +20,8 @@ namespace nm
         public string TypeValue = null;
         public string Value = null;
 
+        public bool Arc = false;
         public bool Static = false;
-        public string StyleVisualization = "3D";
         public float? Radius = null;
 
         public string[] ParentStructuresKeys = null;
@@ -36,13 +36,14 @@ namespace nm
 
         public Vector3 GetPosition(int index)
         {
-            return position[index];
+            return Position[index];
         }
     }
 
     public class StructureModule : MonoBehaviour
     {
         [HideInInspector] public PredicateModule predicateM;
+        [HideInInspector] public ChangeModule changeM;
         private static StructureModule Instance;
 
         private void Awake()
@@ -53,6 +54,7 @@ namespace nm
         private void Start()
         {
             predicateM = PredicateModule.GetInit();
+            changeM = ChangeModule.GetInit();
         }
 
         public static StructureModule GetInit()
@@ -64,23 +66,24 @@ namespace nm
 
         public void NewStructure()
         {
+            structure.Clear();
             structure = new Dictionary<string, Structure>();
         }
-
-        //public void Shift()
-        //{
-        //    foreach(var part in structure)
-        //    {
-        //        if (part.Value.ObjectType == "Metavertex")
-        //            part.Value.position += new Vector3(-4.5f, 0f, -6f);
-        //    }
-        //}
 
         // Загрузка из JSON.
         public void LoadingJson(string path)
         {
+            // СТАДИЯ 1. ЗАГРУЗКА ИЗ JSON В СТРУКТУРУ.
+
+            // Очищаем выделение, если оно и было. 
+            changeM.ResetChange();
+            // Очищаем объекты unity сцены.
             SceneCleaning.Instance.Clean();
+            // Очищаем систему имён.
+            PredicateModule.NameSystem.Clear();
+            // Создаём новую структуру.
             NewStructure();
+
             using (StreamReader sr = new StreamReader(path))
             {
                 string json = sr.ReadToEnd();
@@ -118,6 +121,11 @@ namespace nm
                     part.Value.End = null;
                 }
             }
+
+            // Загружаем новые имена в менеджер имён.
+            PredicateModule.NameSystem.LoadNameDict(ref structure);
+
+            // СТАДИЯ 2. ПОСТРОЕНИЕ ГРАФА ПО СТРУКТУРЕ.
             predicateM.BuildGraphs();
         }
 
@@ -174,7 +182,7 @@ namespace nm
                 // Доработка для дурака. Если указал родителя, то и у родителя должен появиться ребёнок.
                 structure[parentName].ChildStructures[name] = structure[name];
             }
-            if ((childNames != null) && (!(childNames.Count == 0)))
+            if (childNames != null && childNames.Count != 0)
             {
                 foreach (var childN in childNames)
                 {
@@ -185,12 +193,20 @@ namespace nm
             }
         }
 
-        public void AddNodeData(string name, string objectType = null, bool? eo = null, string start = null, string end = null, string typeValue = null, string value = null)
+        public void AddNodeData(string name, Vector3[] position = null, string objectType = null, bool? eo = null, string start = null, string end = null, string typeValue = null, string value = null, bool? isArc = null)
         {
             if (!IsExistNode(name)) return;
+            if (position != null)
+            {
+                structure[name].Position = position;
+            }
             if (objectType != null)
             {
                 structure[name].ObjectType = objectType;
+                if (objectType == "Edge" || objectType == "Metaedge")
+                {
+                    structure[name].Static = true;
+                }
             }
             if (eo != null)
             {
@@ -211,6 +227,22 @@ namespace nm
             if (value != null)
             {
                 structure[name].Value = value;
+            }
+            if (isArc != null)
+            {
+                structure[name].Arc = isArc.GetValueOrDefault();
+            }
+        }
+
+        public void EditNodeData(string name, string newName = null)
+        {
+            // Если что-то изменилось.
+            if (name != newName)
+            {
+                AddNode(newName);
+                structure[newName] = structure[name];
+                structure[newName].Name = newName;
+                structure.Remove(name);
             }
         }
 
@@ -247,75 +279,75 @@ namespace nm
             return currentCount;
         }
 
-        public void OutLog(string nameNode)
-        {
-            if (!IsExistNode(nameNode)) return;
-            if (structure[nameNode].ObjectType == null)
-            {
-                Debug.Log("Не установлен тип. Неопределённый вывод!");
-                return;
-            }
-            if (structure[nameNode].ObjectType == "Vertex" || structure[nameNode].ObjectType == "Metavertex")
-            {
-                string NameObject = structure[nameNode].ObjectType;
-                string output = "<b>" + NameObject + " |</b> Name: " + structure[nameNode].Name;
-                Debug.Log(output);
-            }
-            if (structure[nameNode].ObjectType == "Edge" || structure[nameNode].ObjectType == "Metaedge")
-            {
-                string NameObject = structure[nameNode].ObjectType;
-                string output = "<b>" + NameObject + " |</b> Name: " + structure[nameNode].Name +
-                    " | EdgeDirection: " + structure[nameNode].Eo;
-                if (structure[nameNode].Start != null && structure[nameNode].End != null)
-                {
-                    output += " | Start: " + structure[nameNode].Start + " | End: " + structure[nameNode].End;
-                }
-                Debug.Log(output);
-            }
-            if (structure[nameNode].ObjectType == "Graph" || structure[nameNode].ObjectType == "Metagraph")
-            {
-                string NameObject = structure[nameNode].ObjectType;
-                string output = "<b>" + NameObject + " |</b> Name: " + structure[nameNode].Name;
-                Debug.Log(output);
-            }
-            if (structure[nameNode].ObjectType == "Attribute")
-            {
-                string NameObject = structure[nameNode].ObjectType;
-                string output = "<b>" + NameObject + " |</b> Name: " + structure[nameNode].Name +
-                    " | TypeValue: " + structure[nameNode].TypeValue +
-                    " | Value: " + structure[nameNode].Value;
-                Debug.Log(output);
-            }
-        }
+        //public void OutLog(string nameNode)
+        //{
+        //    if (!IsExistNode(nameNode)) return;
+        //    if (structure[nameNode].ObjectType == null)
+        //    {
+        //        Debug.Log("Не установлен тип. Неопределённый вывод!");
+        //        return;
+        //    }
+        //    if (structure[nameNode].ObjectType == "Vertex" || structure[nameNode].ObjectType == "Metavertex")
+        //    {
+        //        string NameObject = structure[nameNode].ObjectType;
+        //        string output = "<b>" + NameObject + " |</b> Name: " + structure[nameNode].Name;
+        //        Debug.Log(output);
+        //    }
+        //    if (structure[nameNode].ObjectType == "Edge" || structure[nameNode].ObjectType == "Metaedge")
+        //    {
+        //        string NameObject = structure[nameNode].ObjectType;
+        //        string output = "<b>" + NameObject + " |</b> Name: " + structure[nameNode].Name +
+        //            " | EdgeDirection: " + structure[nameNode].Eo;
+        //        if (structure[nameNode].Start != null && structure[nameNode].End != null)
+        //        {
+        //            output += " | Start: " + structure[nameNode].Start + " | End: " + structure[nameNode].End;
+        //        }
+        //        Debug.Log(output);
+        //    }
+        //    if (structure[nameNode].ObjectType == "Graph" || structure[nameNode].ObjectType == "Metagraph")
+        //    {
+        //        string NameObject = structure[nameNode].ObjectType;
+        //        string output = "<b>" + NameObject + " |</b> Name: " + structure[nameNode].Name;
+        //        Debug.Log(output);
+        //    }
+        //    if (structure[nameNode].ObjectType == "Attribute")
+        //    {
+        //        string NameObject = structure[nameNode].ObjectType;
+        //        string output = "<b>" + NameObject + " |</b> Name: " + structure[nameNode].Name +
+        //            " | TypeValue: " + structure[nameNode].TypeValue +
+        //            " | Value: " + structure[nameNode].Value;
+        //        Debug.Log(output);
+        //    }
+        //}
 
-        public void OutLogInfo(string nameNode)
-        {
-            if (!IsExistNode(nameNode)) return;
-            Debug.Log("Название: " + structure[nameNode].Name);
-            if (structure[nameNode].ParentStructures.Count == 0)
-            {
-                Debug.Log("Родители узла отсутствует");
-            }
-            else
-            {
-                foreach (var parent in structure[nameNode].ParentStructures)
-                {
-                    Debug.Log("Родитель: " + parent.Key);
-                }
-            }
+        //public void OutLogInfo(string nameNode)
+        //{
+        //    if (!IsExistNode(nameNode)) return;
+        //    Debug.Log("Название: " + structure[nameNode].Name);
+        //    if (structure[nameNode].ParentStructures.Count == 0)
+        //    {
+        //        Debug.Log("Родители узла отсутствует");
+        //    }
+        //    else
+        //    {
+        //        foreach (var parent in structure[nameNode].ParentStructures)
+        //        {
+        //            Debug.Log("Родитель: " + parent.Key);
+        //        }
+        //    }
 
-            if (structure[nameNode].ChildStructures.Count == 0)
-            {
-                Debug.Log("Дети узла отсутствуют");
-            }
-            else
-            {
-                foreach(var child in structure[nameNode].ChildStructures)
-                {
-                    Debug.Log("Ребёнок: " + child.Key);
-                }
-            }
-        }
+        //    if (structure[nameNode].ChildStructures.Count == 0)
+        //    {
+        //        Debug.Log("Дети узла отсутствуют");
+        //    }
+        //    else
+        //    {
+        //        foreach(var child in structure[nameNode].ChildStructures)
+        //        {
+        //            Debug.Log("Ребёнок: " + child.Key);
+        //        }
+        //    }
+        //}
 
         public bool IsExistNode(string nameNode)
         {

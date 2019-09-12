@@ -26,34 +26,56 @@ namespace nm
         //Система даёт индивидуальный индекс имени.
         public static class NameSystem
         {
-            public static Dictionary<string, int> nameDict = new Dictionary<string, int>();
+            public static List<string> nameDict = new List<string>();
+            public static Dictionary<string, int> countDict = new Dictionary<string, int>();
+
+            public static void LoadNameDict (ref Dictionary<string, Structure> structure)
+            {
+                foreach (var part in structure)
+                {
+                    nameDict.Add(part.Key);
+                }
+            }
 
             public static string GetName(string type)
             {
-                string name = "error";
-                if (nameDict.ContainsKey(type))
-                    nameDict[type]++;
-                else
-                    nameDict.Add(type, 1);
+                string name;
 
-                name = type + nameDict[type];
+                // Будет пробовать подобрать имя, если оно уже есть в nameDick, при этом меняя значения в countDick для дальнейших генераций.
+                do
+                {
+                    if (countDict.ContainsKey(type))
+                        countDict[type]++;
+                    else
+                        countDict.Add(type, 1);
+
+                    name = type + countDict[type];
+
+                } while (nameDict.Contains(name));
+
+                nameDict.Add(name);
+
                 return name;
             }
 
-            public static void RemoveLastIndex(string type)
+            public static void Clear()
             {
-                nameDict[type]--;
+                nameDict.Clear();
+                countDict.Clear();
             }
         }
 
+        // СТАДИЯ 2. ПОСТРОЕНИЕ ГРАФА ПО СТРУКТУРЕ. ПОЛНОЕ СОЗДАНИЕ.
         public void BuildGraphs()
         {
             foreach(var part in structureM.structure)
             {
+                // Вызываем единичное обновление на каждый объект.
                 TactBuild(part.Key, part.Value.ObjectType);
             }
         }
 
+        // ЕДИНИЧНОЕ ОБНОВЛЕНИЕ ПРЕДИКАТА.
         public void TactBuild(string name, string objectType)
         {
             switch (objectType)
@@ -103,24 +125,13 @@ namespace nm
 
                 if (m_structure.ChildStructures != null && m_structure.ChildStructures.Count >= 1)
                 {
-                    // Стандартное, 3D представление вершины или графа.
-                    if (m_structure.StyleVisualization == null || m_structure.StyleVisualization == "3D")
+                    // Вершина-связь.
+                    foreach (var part in m_structure.ChildStructures)
                     {
-                        // Вершина-связь.
-                        foreach (var part in m_structure.ChildStructures)
-                        {
-                            // Не делаем связь с Edge и MetaEdge
-                            if (part.Value.Static) continue;
-                            Vector3 childPosition = part.Value.GetPosition(0);
-                            m_structure.gameObject.AddRange(InitObject.Instance.InitLine(true, position, childPosition, m_structure.color, Name));
-                        }
-                    }
-                    // 2D представление вершины или графа.
-                    else if (m_structure.StyleVisualization == "2D")
-                    {
-                        float radius = (float)m_structure.Radius;
-                        size = new Vector3(radius, 0.005f, radius); // TO DO
-                        m_structure.gameObject.Add(InitObject.Instance.InitGraph(position, size, m_structure.color, Name, Style3D:false));
+                        // Не делаем связь с Edge и MetaEdge
+                        if (part.Value.Static) continue;
+                        Vector3 childPosition = part.Value.GetPosition(0);
+                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(true, position, childPosition, m_structure.color, Name));
                     }
                 }
                 else
@@ -177,15 +188,16 @@ namespace nm
                         postionList.Add(m_structureDict[m_structure.Start].GetPosition(0));
                     }
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <<
-                    if (m_structure.position.Length == 0)
+
+                    if (m_structure.Position.Length == 0)
                     {
                         foreach (var part in m_structure.ChildStructures)
                         {
-                            postionList.Add(part.Value.position[0]);
+                            postionList.Add(part.Value.Position[0]);
                         }
                     }
                     else
-                    if (m_structure.position.Length > 0 && m_structure.ChildStructures.Count == 2) // TO DO. Связи между объектами и текущие дополнительные позиции.
+                    if (m_structure.Position.Length > 0 && m_structure.ChildStructures.Count == 2) // TO DO. Связи между объектами и текущие дополнительные позиции.
                     {
                         int k = 0;
                         // Плохой код.
@@ -193,12 +205,12 @@ namespace nm
                         {
                             if (k == 0)
                             {
-                                postionList.Add(part.Value.position[0]);
-                                postionList.AddRange(m_structure.position);
+                                postionList.Add(part.Value.Position[0]);
+                                postionList.AddRange(m_structure.Position);
                             }
                             if (k == 1)
                             {
-                                postionList.Add(part.Value.position[0]);
+                                postionList.Add(part.Value.Position[0]);
                                 break;
                             }
                             k++;
@@ -210,7 +222,6 @@ namespace nm
                     {
                         postionList.Add(m_structureDict[m_structure.End].GetPosition(0));
                     }
-
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Билдер
                     int n = 0;
                     Vector3 lastPosition = Vector3.zero;
@@ -225,7 +236,8 @@ namespace nm
                             continue;
                         }
                         nextPosition = position;
-                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(false, lastPosition, nextPosition, m_structure.color, Name));
+                        // TO DO. Сделать свойство isArc у связи вариативным: прямая, дуга.
+                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(m_structure.Arc, false, lastPosition, nextPosition, m_structure.color, Name, isSimple: true));
                         lastPosition = nextPosition;
                         n++;
                     }

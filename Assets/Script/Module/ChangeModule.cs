@@ -9,29 +9,28 @@ namespace nm
     {
         public static ChangeModule Instance;
 
-        public float doubleTapDelay = 0.4f;
         private FreeCamera freeCamera;
         private StructureModule structureM;
         private PredicateModule predicateM;
 
+        private InteractionModule interactionM;
+
         public GameObject changeTransform;
         public GameObject changeInformation;
 
-        public Text coordinates;
+        public InputField inputFieldX;
+        public InputField inputFieldY;
+        public InputField inputFieldZ;
+
         public Transform visualStyleToggle;
-        private Toggle visualStyle;
-        private bool isChangedStyle = false;
 
         private GUIChangeModule guiChangeM;
-        private LogicModule logicM;
         private ResourceManager resourceM;
         [HideInInspector] public Vector3 positionSelected = new Vector3(0f, 0f, 0f);
         [HideInInspector] public string saveSelectName = null;
 
         private Vector3 SavePosition = new Vector3(0f, 0f, 0f);
-        private float tapCount = 0;
         private GameObject markerObject = null;
-        private Structure targetObject = new Structure();
 
         private void Awake()
         {
@@ -46,9 +45,7 @@ namespace nm
 
         private void Start()
         {
-            visualStyle = visualStyleToggle.GetComponent<Toggle>();
-
-            logicM = LogicModule.GetInit();
+            interactionM = InteractionModule.GetInit();
             structureM = StructureModule.GetInit();
             predicateM = PredicateModule.GetInit();
             resourceM = ResourceManager.GetInstance();
@@ -58,85 +55,41 @@ namespace nm
             markerObject.SetActive(false);
         }
 
-        private void DoubleTap(string methodLuck)
+        // ПОДТВЕРЖДЕНИЕ ИЗМЕНЕНИЯ ГРАФА.
+        public void UpdateChange()
         {
-            tapCount++;
-            if (tapCount == 2)
+            // Если позиции действительно сменились, то задаём их.
+            if (saveSelectName != null && interactionM.targetObject.GetPosition(0) != positionSelected && positionSelected != new Vector3(0f, 0f, 0f))
             {
-                CancelInvoke("FailDoubleTap");
-                tapCount = 0;
-                Invoke(methodLuck, 0f);
-                return;
-            }
-
-            Invoke("FailDoubleTap", doubleTapDelay);
-        }
-
-        private void FailDoubleTap()
-        {
-            tapCount = 0;
-        }
-
-        public void UpdateChange() // TO DO
-        {
-            bool rebuild = false;
-            string visualStyleStr = (visualStyle.isOn) ? "3D" : "2D";
-
-            if (targetObject.StyleVisualization != visualStyleStr)
-            {
-                isChangedStyle = true;
-            }
-
-            if (isChangedStyle)
-            {
-                if (visualStyleStr == "3D")
-                {
-                    targetObject.StyleVisualization = visualStyleStr;
-                    logicM.LogicAdd(targetObject.Name);
-                    rebuild = true;
-                }
-
-                if (visualStyleStr == "2D")
-                {
-                    targetObject.StyleVisualization = visualStyleStr;
-                    logicM.LogicAdd2D(targetObject.Name);
-                    rebuild = true;
-                }
-                isChangedStyle = false;
-            }
-
-            if (saveSelectName != null && targetObject.GetPosition(0) != positionSelected)
-            {
-                targetObject.position[0] = positionSelected;
-                rebuild = true;
-            }
-
-            if (rebuild)
-            {
+                interactionM.targetObject.Position[0] = positionSelected;
                 RebuildObject("rebuild");
             }
         }
 
+        // Пересобирает окружение в зависимости от режима (удаление части или перестройка), требуется имя части.
         public void RebuildObject(string typeRebuild, string name = null)
         {
-            Structure target;
-            if (name != null)
-            {
-                target = structureM.structure[name];
-            }
-            else
-            {
-                target = targetObject;
-            }
+            Structure target = (name != null) ? structureM.structure[name] : interactionM.targetObject;
+
+            // Пересоздаём всех детей.
+            //foreach (var part in target.ChildStructures)
+            //{
+            //    DeleteObject(part.Value.gameObject);
+            //    if (typeRebuild == "rebuild")
+            //    {
+            //        predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
+            //    }
+            //}
 
             // Пересоздаём всех детей.
             foreach (var part in target.ChildStructures)
             {
                 DeleteObject(part.Value.gameObject);
-                if (typeRebuild == "rebuild")
+                if (typeRebuild == "delete")
                 {
-                    predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
+                    part.Value.ParentStructures.Remove(target.Name);
                 }
+                predicateM.TactBuild(part.Value.Name, part.Value.ObjectType);
             }
 
             // Пересоздаём всех родителей.
@@ -161,6 +114,7 @@ namespace nm
             }
         }
 
+        // Удаляет поданный список gameObject.
         private void DeleteObject(List<GameObject> gameObject)
         {
             int k = 0;
@@ -174,6 +128,7 @@ namespace nm
 
         public void ShowChangeMenu(string name)
         {
+            //interactionM.isPanelActive = true;
             changeInformation.SetActive(true);
             //Если элемент не статический (не Edge и Metaedge).
             if (!structureM.structure[name].Static)
@@ -182,51 +137,64 @@ namespace nm
             }
         }
 
+        // Если нажали Esc или переключились на другой объект.
         public void ResetChange()
         {
+            interactionM.isNowSelected = false;
+
+            interactionM.isConnection = false;
+            interactionM.SelectActive(interactionM.startConnectionObject, false);
+            interactionM.startConnectionObject = null;
+
+            //interactionM.isPanelActive = false;
             saveSelectName = null;
             freeCamera.selectedObject = null;
             changeTransform.SetActive(false);
+            guiChangeM.CheckChange();
             changeInformation.SetActive(false);
             markerObject.SetActive(false);
             positionSelected = new Vector3(0f, 0f, 0f);
-            if (targetObject.Static)
+            if (interactionM.targetObject != null && interactionM.targetObject.Static)
             {
-                foreach (var part in targetObject.gameObject)
+                foreach (var part in interactionM.targetObject.gameObject)
                 {
                     part.GetComponent<Outline>().enabled = false;
                 }
             }
-        }
-
-        public void DeleteObject(string name = null)
-        {
-            RebuildObject("delete", name);
-            ResetChange();
+            interactionM.targetObject = null;
         }
 
         void Update()
         {
+            // Если сейчас что-то выделено и на нём висит красный Маркер.
             if (markerObject != null)
             {
-                // DO TO. KEY
-                if(Input.GetKeyDown(KeyCode.Return))
-                {
-                    UpdateChange();
-                }
+                Vector3 transformMarker = markerObject.transform.localPosition;
+                inputFieldX.text = transformMarker.x.ToString("0.00");
+                inputFieldY.text = transformMarker.y.ToString("0.00");
+                inputFieldZ.text = transformMarker.z.ToString("0.00");
 
-                Transform transformMarker = markerObject.transform;
-                coordinates.text = transformMarker.localPosition.ToString();
-
-                if (transformMarker.localPosition != SavePosition)
+                // Если поменяли позиции маркера.
+                if (transformMarker != SavePosition)
                 {
-                    SavePosition = transformMarker.localPosition;
+                    // Сбиваем соединение, ибо сместили.
+                    interactionM.isConnection = false;
+                    interactionM.SelectActive(interactionM.startConnectionObject, false);
+                    interactionM.startConnectionObject = null;
+
+                    SavePosition = transformMarker;
                     positionSelected = SavePosition;
                 }
                 // DO TO. KEY
-                if (Input.GetKeyDown(KeyCode.Delete))
+                if (Input.GetKeyDown(KeyCode.Return) && interactionM.isNowSelected)
                 {
-                    DeleteObject();
+                    UpdateChange();
+                }
+                // DO TO. KEY
+                if (Input.GetKeyDown(KeyCode.Delete) && interactionM.isNowSelected)
+                {
+                    RebuildObject("delete");
+                    ResetChange();
                 }
                 // DO TO. KEY
                 if (Input.GetKeyDown(KeyCode.Escape))
@@ -240,17 +208,15 @@ namespace nm
                 saveSelectName = freeCamera.selectedObject;
                 if (saveSelectName != null)
                 {
-                    targetObject = structureM.structure[saveSelectName];
-                    if (!targetObject.Static)
+                    interactionM.targetObject = structureM.structure[saveSelectName];
+                    if (!interactionM.targetObject.Static)
                     {
-                        markerObject.transform.position = targetObject.GetPosition(0);
+                        markerObject.transform.position = interactionM.targetObject.GetPosition(0);
                         markerObject.SetActive(true);
-                        visualStyle.isOn = (targetObject.StyleVisualization == "3D") ? true : false;
-                        isChangedStyle = false;
                     }
                     else
                     {
-                        foreach (var part in targetObject.gameObject)
+                        foreach (var part in interactionM.targetObject.gameObject)
                         {
                             part.GetComponent<Outline>().enabled = true;
                         }
@@ -259,9 +225,36 @@ namespace nm
                 }
                 else
                 {
+                    // Если контейнер выбранного объекта пуст, то выключаем маркер.
                     markerObject.SetActive(false);
                 }
             }
         }
+
+        public void UpdatePositionFieldX(string value)
+        {
+            Vector3 currentPostion = markerObject.transform.localPosition;
+            float? valueX = float.Parse(value);
+            if (valueX != null)
+            {
+                currentPostion.x = valueX.GetValueOrDefault();
+                markerObject.transform.localPosition = currentPostion;
+            }
+        }
+
+        public void UpdatePositionFieldY(string value)
+        {
+            Vector3 currentPostion = markerObject.transform.localPosition;
+            currentPostion.y = float.Parse(value);
+            markerObject.transform.localPosition = currentPostion;
+        }
+
+        public void UpdatePositionFieldZ(string value)
+        {
+            Vector3 currentPostion = markerObject.transform.localPosition;
+            currentPostion.z = float.Parse(value);
+            markerObject.transform.localPosition = currentPostion;
+        }
+
     }
 }

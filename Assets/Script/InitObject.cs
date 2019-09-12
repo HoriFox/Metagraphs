@@ -6,12 +6,11 @@ namespace nm
     public class InitObject : MonoBehaviour
     {
         public static InitObject Instance;
+        public GameObject prefabSelectedContainer;
 
         private void Start()
         {
             Instance = this;
-            //parentSimple = new GameObject("TestSimple").transform;
-
             resourceM = ResourceManager.GetInstance();
         }
 
@@ -21,51 +20,19 @@ namespace nm
         public Vector3 scaleLGraph = new Vector3(0.2f, 0.2f, 0.2f);
         public Vector3 scaleLink = new Vector3(0.05f, 0.05f, 0.05f);
 
-        //Transform parentSimple;
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // БОЛЬШАЯ ЧАСТЬ ЭТОГО КОДА ПОЙДЁТ В МУСОРКУ. ОСТАВИМ ТОЛЬКО ИНИЦИАЛИЗАЦИИ ДЛЯ КЛАССОВ.
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //public void Create()
-        //{
-        //    string line;
-        //    System.IO.StreamReader file = new System.IO.StreamReader(Application.dataPath + "/Save/simple.txt");
-        //    while ((line = file.ReadLine()) != null)
-        //    {
-        //        String[] words = line.Split(new char[] { ',', '(', ')', '[', ']', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-        //        if (words[0] == "#") continue;
-        //        if (words[0] == "GRAPH")
-        //        {
-        //            InitGraph(new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
-        //                new Color32(byte.Parse(words[5]), byte.Parse(words[6]), byte.Parse(words[7]), 128), words[1], parentSimple);
-        //        }
-        //        if (words[0] == "LGRAPH")
-        //        {
-        //            InitLine(true, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
-        //                new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
-        //                new Color32(byte.Parse(words[8]), byte.Parse(words[9]), byte.Parse(words[10]), 128), words[1], parentSimple);
-        //        }
-        //        if (words[0] == "LINK")
-        //        {
-        //            InitLine(false, new Vector3(float.Parse(words[2]), float.Parse(words[3]), float.Parse(words[4])),
-        //                new Vector3(float.Parse(words[5]), float.Parse(words[6]), float.Parse(words[7])),
-        //                new Color32(0, 0, 0, 128), words[1], parentSimple);
-        //        }
-        //    }
-        //    file.Close();
-        //}
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        public GameObject InitGraph(Vector3 position, Vector3 _scale, Color32 _color, string _name, Transform parent = null, bool Style3D = true)
+        public GameObject InitGraph(Vector3 position, Vector3 _scale, Color32 _color, string _name, Transform parent = null/*, bool Style3D = true*/)
         {
             Transform parentUse = parent ?? parentStandart;
-            string namePrefabObject = (Style3D) ? "GraphPrefab" : "2DVertexPrefab";
-            GameObject objectVar = Instantiate(resourceM.GetPrefab(namePrefabObject), position, Quaternion.identity, parentUse).gameObject;
+            //string namePrefabObject = (Style3D) ? "GraphPrefab" : "2DVertexPrefab";
+            GameObject objectVar = Instantiate(resourceM.GetPrefab("GraphPrefab"), position, Quaternion.identity, parentUse).gameObject;
             objectVar.transform.localScale = _scale;
             objectVar.GetComponent<Renderer>().material.color = _color;
             objectVar.name = _name;
-            objectVar.GetComponent<TooltipText>().text = _name;
-            
+
+            TooltipText tT = objectVar.GetComponent<TooltipText>();
+            tT.text = _name;
+            tT.selectedContainer = Instantiate(prefabSelectedContainer, objectVar.transform);
+
             objectVar.GetComponentInChildren<TextMesh>().text = _name;
             // Расчёт степени контрастности и соответствующего цвета.
             objectVar.GetComponentInChildren<TextMesh>().color = (_color.r * 0.299 + _color.g * 0.587 + _color.b * 0.114 <= 140) ? Color.white : Color.black;
@@ -73,10 +40,67 @@ namespace nm
             return objectVar;
         }
 
-        public List<GameObject> InitLine(bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, Color32 color, string _name, Transform parent = null)
+        private Vector3 GetPerpendicular(Vector3 inputVector, float factorAdditional)
+        {
+            Vector3 rotate = new Vector3(-inputVector.y, inputVector.x, inputVector.z);
+            rotate = rotate.normalized * factorAdditional;
+            Vector3 offset = rotate + inputVector / 2;
+            return offset;
+        }
+
+        public Vector3 additional = new Vector3();
+
+        [Range(3, 20)]
+        public int quality = 6;
+
+        [Range(-10.0f, 10.0f)]
+        public float factorAdditional = 5.0f;
+
+        public List<GameObject> InitLine(bool isArc, bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, Color32 color, string _name, Transform parent = null, bool isSimple = false)
+        {
+            List<GameObject> gameObject;
+            if (isArc)
+            {
+                gameObject = new List<GameObject>();
+
+                float dividerPhase = 1.0f / quality;
+                float currentPhase = 0.0f;
+
+                additional = GetPerpendicular(positionSecond - positionFirst, factorAdditional) + positionFirst;
+
+                Vector3 lastPoint = positionFirst;
+
+                int numberPhase = 0;
+                while (numberPhase <= quality)
+                {
+                    Vector3 m1 = Vector3.Lerp(positionFirst, additional, currentPhase);
+                    Vector3 m2 = Vector3.Lerp(additional, positionSecond, currentPhase);
+
+                    Vector3 nextPoint = Vector3.Lerp(m1, m2, currentPhase);
+                    if (numberPhase != 0)
+                    {
+                        // "ArcEdge_" + _name + "_" + numberPhase
+                        gameObject.AddRange(InitLine(false, lastPoint, nextPoint, color, _name, isSimple: true));
+                    }
+
+                    lastPoint = nextPoint;
+
+                    currentPhase += dividerPhase;
+                    numberPhase++;
+                }
+            }
+            else
+            {
+                gameObject = new List<GameObject>();
+                gameObject.AddRange(InitLine(isLGraph, positionFirst, positionSecond, color, _name, parent, isSimple));
+            }
+            return gameObject;
+        }
+
+        public List<GameObject> InitLine(bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, Color32 color, string _name, Transform parent = null, bool isSimple = false)
         {
             Transform parentUse = parent ?? parentStandart;
-            List<GameObject> gameObjects = CreateLine(isLGraph, positionFirst, positionSecond, color, _name, parentUse);
+            List<GameObject> gameObjects = CreateLine(isLGraph, positionFirst, positionSecond, color, _name, parentUse, isSimple);
             foreach (var part in gameObjects)
             {
                 part.name = _name;
@@ -85,12 +109,15 @@ namespace nm
             return gameObjects;
         }
 
-        private List<GameObject> CreateLine(bool isLGraph, Vector3 firstPoint, Vector3 secondPoint, Color32 color, string _name, Transform parent)
+        private List<GameObject> CreateLine(bool isLGraph, Vector3 firstPoint, Vector3 secondPoint, Color32 color, string _name, Transform parent, bool isSimple)
         {
             List<GameObject> gameObjects = new List<GameObject>();
-            gameObjects.Add(InitSphere(isLGraph, firstPoint, color, parent));
-            gameObjects.Add(InitSphere(isLGraph, secondPoint, color, parent));
-            gameObjects.Add(InitOneLine(isLGraph, gameObjects[0].transform.position, gameObjects[1].transform.position, color, _name, parent));
+            if (!isSimple)
+            {
+                gameObjects.Add(InitSphere(isLGraph, firstPoint, color, parent));
+                gameObjects.Add(InitSphere(isLGraph, secondPoint, color, parent));
+            }
+            gameObjects.Add(InitOneLine(isLGraph, firstPoint, secondPoint, color, _name, parent));
             return gameObjects;
         }
         private GameObject InitSphere(bool isLGraph, Vector3 point, Color32 color, Transform parent)

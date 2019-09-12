@@ -10,15 +10,16 @@ namespace nm
     {
         private StructureModule structureM;
         private ChangeModule changeM;
-        //private OutlogModule outlogM;
         private static GUIChangeModule init;
 
-        public Text nameTarget;
+
+        public Text nameCurrentTarget;
         public Text typeTarget;
-        public InputField nameStart;
-        public InputField nameEnd;
-        public Dropdown typeEnvironment;
-        public InputField nameEnvironment;
+
+        //public InputField nameStart;
+        //public InputField nameEnd;
+        //public Dropdown typeEnvironment;
+        //public InputField nameEnvironment;
         public Transform scrollViewParent;
         public Transform scrollViewChild;
 
@@ -30,7 +31,6 @@ namespace nm
         private void Start()
         {
             structureM = StructureModule.GetInit();
-            //outlogM = OutlogModule.GetInit();
             changeM = ChangeModule.GetInit();
         }
 
@@ -94,9 +94,14 @@ namespace nm
         //    }
         //}
 
+        //public void OutLog(string message)
+        //{
+        //    Debug.Log(message);
+        //}
+
         public void OpenInformation()
         {
-            nameTarget.text = changeM.saveSelectName;
+            nameCurrentTarget.text = changeM.saveSelectName;
             Structure structure = structureM.structure[changeM.saveSelectName];
             typeTarget.text = structure.ObjectType;
             ScrollViewHelper viewHelperParent = scrollViewParent.GetComponent<ScrollViewHelper>();
@@ -106,6 +111,27 @@ namespace nm
             viewHelperParent.ShowList(structureM.structure[changeM.saveSelectName].ParentStructuresKeys);
             viewHelperChild.ShowList(structureM.structure[changeM.saveSelectName].ChildStructuresKeys);
         }
+
+        public void CheckChange()
+        {
+            //if (startName != null && startName != nameCurrentTarget.text)
+            //{
+            //    structureM.EditNodeData(startName, nameCurrentTarget.text);
+            //}
+        }
+
+        // Добавить выбранное окружение.
+        public void AddEnvironment()
+        {
+            Debug.Log("Добавить в папку");
+        }
+
+        //Не могу поставить на префаб данную функцию.
+        //// Удалить выбранное окружение.
+        //public void DeleteEnvironment()
+        //{
+        //    Debug.Log("Удалить из папки");
+        //}
 
         //public void UpdateInformation()
         //{
