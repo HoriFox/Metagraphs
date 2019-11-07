@@ -145,7 +145,6 @@ namespace nm
                             }
                             else
                             {
-                                //Debug.Log(objectHit.name);
                                 interactionM.SelectObjectAndOpenMenu(objectHit.name);
                             }
                         }

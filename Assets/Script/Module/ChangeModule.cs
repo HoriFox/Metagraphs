@@ -23,6 +23,8 @@ namespace nm
         //public Text typeTarget;
         public GameObject nameCurrentWarning;
 
+        public InputField descriptionCurrentTarget;
+
         public InputField inputFieldX;
         public InputField inputFieldY;
         public InputField inputFieldZ;
@@ -35,6 +37,7 @@ namespace nm
         public Slider greenSlider;
         public Slider blueSlider;
 
+        public Toggle direction;
         public Toggle typeLine;
 
         public Toggle transformChangeButton;
@@ -58,6 +61,9 @@ namespace nm
         //public GameObject markerObjectCenter;
         //private float timeToHideMarker = 0f;
         //private bool momentHideMarkerCenter = false;
+
+        [HideInInspector] public bool isSelectStage = false;
+
 
         private void Awake()
         {
@@ -160,6 +166,7 @@ namespace nm
         {
             //Debug.Log(name);
             nameCurrentTarget.text = name;
+            descriptionCurrentTarget.text = structureM.structure[name].Description;
 
             changePanel.SetActive(true);
             transformChangeButton.isOn = true;
@@ -170,17 +177,13 @@ namespace nm
                 inputFieldX.interactable = false;
                 inputFieldY.interactable = false;
                 inputFieldZ.interactable = false;
-                typeLine.interactable = true;
                 edgeChangeButton.interactable = true;
-
-                typeLine.isOn = structureM.structure[name].Arc;
             }
             else
             {
                 inputFieldX.interactable = true;
                 inputFieldY.interactable = true;
                 inputFieldZ.interactable = true;
-                typeLine.interactable = false;
                 edgeChangeButton.interactable = false;
             }
         }
@@ -251,10 +254,11 @@ namespace nm
                 // Если поменяли позиции маркера.
                 if (transformMarker != SavePosition)
                 {
+                    // ОШИБКА ВЫДИЛЕНИЯ! TO DO (Я закоментировал, пока никаких неверностей)
                     // Сбиваем соединение, ибо сместили.
-                    interactionM.isConnection = false;
-                    interactionM.SelectActive(interactionM.startConnectionObject, false);
-                    interactionM.startConnectionObject = null;
+                    //interactionM.isConnection = false;
+                    //interactionM.SelectActive(interactionM.startConnectionObject, false);
+                    //interactionM.startConnectionObject = null;
 
                     SavePosition = transformMarker;
                     positionSelected = SavePosition;
@@ -269,6 +273,9 @@ namespace nm
             // Одноразовое включение заселекченного объекта.
             if (saveSelectName != freeCamera.selectedObject)
             {
+                // Установка флага работы select.
+                isSelectStage = true;
+
                 saveSelectName = freeCamera.selectedObject;
                 if (saveSelectName != null)
                 {
@@ -282,9 +289,10 @@ namespace nm
                     else
                     {
                         markerObject.transform.localPosition = Vector3.zero;
+
                         foreach (var part in interactionM.targetObject.gameObject)
                         {
-                            part.GetComponent<Outline>().enabled = true;
+                            part.gameObject.GetComponent<Outline>().enabled = true;
                         }
                     }
                     guiChangeM.OpenInformation();
@@ -293,16 +301,26 @@ namespace nm
                     greenSlider.value = interactionM.targetObject.color.g;
                     blueSlider.value = interactionM.targetObject.color.b;
 
-
+                    direction.isOn = interactionM.targetObject.Eo;
+                    typeLine.isOn = interactionM.targetObject.Arc;
                     factorBendingSlider.value = interactionM.targetObject.HeightArc;
+                    factorBendingValue.text = interactionM.targetObject.HeightArc.ToString("0.0");
                     arcAngleSlider.value = interactionM.targetObject.AngleArc;
+                    arcAngleValue.text = interactionM.targetObject.AngleArc.ToString("0.");
                 }
                 else
                 {
                     // Если контейнер выбранного объекта пуст, то выключаем маркер.
                     markerObject.SetActive(false);
                 }
+
+                Invoke("ClearIgnoreBool", 0.1f);
             }
+        }
+
+        public void ClearIgnoreBool()
+        {
+            isSelectStage = false;
         }
 
         public void UpdatePositionFieldX(string value)
@@ -340,77 +358,84 @@ namespace nm
 
         public void UpdateFactorBending(float value)
         {
-            factorBendingValue.text = value.ToString("0.0");
+            // Защита от On Value Change при установке стандартных значений при открытии.
+            if (!isSelectStage)
+            {
+                factorBendingValue.text = value.ToString("0.0");
 
-            Structure updateObject = structureM.structure[freeCamera.selectedObject];
-            structureM.structure[freeCamera.selectedObject].HeightArc = value;
+                Structure updateObject = structureM.structure[freeCamera.selectedObject];
+                structureM.structure[freeCamera.selectedObject].HeightArc = value;
 
-            DeleteObject(updateObject.gameObject);
-            predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+                DeleteObject(updateObject.gameObject);
+                predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+            }
         }
 
         public void UpdateArcAngle(float value)
         {
-            arcAngleValue.text = value.ToString("0.");
+            // Защита от On Value Change при установке стандартных значений при открытии.
+            if (!isSelectStage)
+            {
+                arcAngleValue.text = value.ToString("0.");
 
-            Structure updateObject = structureM.structure[freeCamera.selectedObject];
-            structureM.structure[freeCamera.selectedObject].AngleArc = value;
+                Structure updateObject = structureM.structure[freeCamera.selectedObject];
+                structureM.structure[freeCamera.selectedObject].AngleArc = value;
 
-            DeleteObject(updateObject.gameObject);
-            predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+                DeleteObject(updateObject.gameObject);
+                predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+            }
         }
 
         public void UpdateColorRed(float value)
         {
-            //momentHideMarkerCenter = true;
-            //timeToHideMarker = Time.time + 1f;
-            Structure structure = interactionM.targetObject;
-            Color32 currentColor = structure.color;
-            currentColor.r = (byte)value;
-            redValue.text = value.ToString("0.");
-            foreach (var part in structure.gameObject)
+            // Защита от On Value Change при установке стандартных значений при открытии.
+            if (!isSelectStage)
             {
-                part.GetComponent<Renderer>().material.color = currentColor;
+                Structure structure = interactionM.targetObject;
+                Color32 currentColor = structure.color;
+                currentColor.r = (byte)value;
+                redValue.text = value.ToString("0.");
+                foreach (var part in structure.gameObject)
+                {
+                    part.GetComponent<Renderer>().material.color = currentColor;
+                }
+                interactionM.targetObject.color = currentColor;
             }
-            interactionM.targetObject.color = currentColor;
         }
 
         public void UpdateColorGreen(float value)
         {
-            //momentHideMarkerCenter = true;
-            //timeToHideMarker = Time.time + 1f;
-            Structure structure = interactionM.targetObject;
-            Color32 currentColor = structure.color;
-            currentColor.g = (byte)value;
-            greenValue.text = value.ToString("0.");
-            foreach (var part in structure.gameObject)
+            // Защита от On Value Change при установке стандартных значений при открытии.
+            if (!isSelectStage)
             {
-                part.GetComponent<Renderer>().material.color = currentColor;
+                Structure structure = interactionM.targetObject;
+                Color32 currentColor = structure.color;
+                currentColor.g = (byte)value;
+                greenValue.text = value.ToString("0.");
+                foreach (var part in structure.gameObject)
+                {
+                    part.GetComponent<Renderer>().material.color = currentColor;
+                }
+                interactionM.targetObject.color = currentColor;
             }
-            interactionM.targetObject.color = currentColor;
         }
 
         public void UpdateColorBlue(float value)
         {
-            //momentHideMarkerCenter = true;
-            //timeToHideMarker = Time.time + 1f;
-            Structure structure = interactionM.targetObject;
-            Color32 currentColor = structure.color;
-            currentColor.b = (byte)value;
-            blueValue.text = value.ToString("0.");
-            foreach (var part in structure.gameObject)
+            // Защита от On Value Change при установке стандартных значений при открытии.
+            if (!isSelectStage)
             {
-                part.GetComponent<Renderer>().material.color = currentColor;
+                Structure structure = interactionM.targetObject;
+                Color32 currentColor = structure.color;
+                currentColor.b = (byte)value;
+                blueValue.text = value.ToString("0.");
+                foreach (var part in structure.gameObject)
+                {
+                    part.GetComponent<Renderer>().material.color = currentColor;
+                }
+                interactionM.targetObject.color = currentColor;
             }
-            interactionM.targetObject.color = currentColor;
         }
-
-        //IEnumerator MomentHide ()
-        //{
-        //    markerObject.SetActive(false);
-        //    yield return new WaitForSecondsRealtime(1f);
-        //    markerObject.SetActive(true);
-        //}
 
         public void UpdateNameObject(string value)
         {
@@ -429,11 +454,14 @@ namespace nm
                     foreach (var part in intermediate.ChildStructures)
                     {
                         // Для корректного отображения в редакторе связей.
-                        for (int i = 0; i < part.Value.ParentStructuresKeys.Length; i++)
+                        if (part.Value.ParentStructuresKeys != null)
                         {
-                            if (part.Value.ParentStructuresKeys[i] == intermediate.Name)
+                            for (int i = 0; i < part.Value.ParentStructuresKeys.Length; i++)
                             {
-                                part.Value.ParentStructuresKeys[i] = value;
+                                if (part.Value.ParentStructuresKeys[i] == intermediate.Name)
+                                {
+                                    part.Value.ParentStructuresKeys[i] = value;
+                                }
                             }
                         }
 
@@ -444,11 +472,14 @@ namespace nm
                     foreach (var part in intermediate.ParentStructures)
                     {
                         // Для корректного отображения в редакторе связей.
-                        for (int i = 0; i < part.Value.ChildStructuresKeys.Length; i++)
+                        if (part.Value.ChildStructuresKeys != null)
                         {
-                            if (part.Value.ChildStructuresKeys[i] == intermediate.Name)
+                            for (int i = 0; i < part.Value.ChildStructuresKeys.Length; i++)
                             {
-                                part.Value.ChildStructuresKeys[i] = value;
+                                if (part.Value.ChildStructuresKeys[i] == intermediate.Name)
+                                {
+                                    part.Value.ChildStructuresKeys[i] = value;
+                                }
                             }
                         }
 
@@ -474,8 +505,34 @@ namespace nm
 
         public void UpdateArc(bool value)
         {
+            // Защита от On Value Change при установке стандартных значений при открытии.
+            if (!isSelectStage)
+            {
+                Structure updateObject = structureM.structure[freeCamera.selectedObject];
+                structureM.structure[freeCamera.selectedObject].Arc = value;
+
+                DeleteObject(updateObject.gameObject);
+                predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+            }
+        }
+
+        public void UpdateDirection(bool value)
+        {
+            // Защита от On Value Change при установке стандартных значений при открытии.
+            if (!isSelectStage)
+            {
+                Structure updateObject = structureM.structure[freeCamera.selectedObject];
+                structureM.structure[freeCamera.selectedObject].Eo = value;
+
+                DeleteObject(updateObject.gameObject);
+                predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+            }
+        }
+
+        public void UpdateDescription(string value)
+        {
             Structure updateObject = structureM.structure[freeCamera.selectedObject];
-            structureM.structure[freeCamera.selectedObject].Arc = value;
+            structureM.structure[freeCamera.selectedObject].Description = value;
 
             DeleteObject(updateObject.gameObject);
             predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);

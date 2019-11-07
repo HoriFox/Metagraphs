@@ -123,6 +123,12 @@ namespace nm
                 sphereFirst.GetComponent<Renderer>().material.color = new Color32(color.r, color.g, color.b, color.a);
                 gameObjects.Add(sphereFirst);
 
+                TooltipText tT = sphereFirst.GetComponent<TooltipText>();
+                tT.text = _name;
+                GameObject selectMarker = Instantiate(prefabSelectedContainer, sphereFirst.transform);
+                selectMarker.transform.localScale = new Vector3(3f, 3f, 3f);
+                tT.selectedContainer = selectMarker;
+
                 GameObject sphereSecond = Instantiate(resourceM.GetPrefab("SpherePrefab"), positionSecond, Quaternion.identity, parentUse);
                 sphereSecond.transform.localScale = (isLGraph) ? scaleLGraph : scaleLink;
                 sphereSecond.GetComponent<Renderer>().material.color = new Color32(color.r, color.g, color.b, color.a);

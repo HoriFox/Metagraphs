@@ -236,7 +236,6 @@ namespace nm
                             continue;
                         }
                         nextPosition = position;
-                        // TO DO. Сделать свойство isArc у связи вариативным: прямая, дуга.
                         m_structure.gameObject.AddRange(InitObject.Instance.InitLine(m_structure.Arc, m_structure.HeightArc, m_structure.AngleArc, false, lastPosition, nextPosition, m_structure.Eo, m_structure.color, Name, isSimple: true));
                         lastPosition = nextPosition;
                         n++;

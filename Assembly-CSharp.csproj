@@ -103,6 +103,7 @@
     <Compile Include="Assets\Script\Tooltip\TooltipText.cs" />
     <Compile Include="Assets\Script\Tooltip\TooltipTextUI.cs" />
     <Compile Include="Assets\TestParabola.cs" />
+    <Compile Include="Assets\TransformCompass.cs" />
     <None Include="Assets\EditorSettings.xml" />
     <None Include="Assets\Shader\OutlineFill.shader" />
     <None Include="Assets\Save\simple.txt" />
@@ -357,6 +358,9 @@
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
       <HintPath>C:/Users/HoriFox/Desktop/Представление метаграфов/Metagraphs/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>C:/Users/HoriFox/Desktop/Представление метаграфов/Metagraphs/Assets/Plugins/System.Windows.Forms.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.2f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>

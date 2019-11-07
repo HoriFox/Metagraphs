@@ -106,7 +106,11 @@ namespace nm
         {
             string typeStart = structureM.structure[startConnectionObject].ObjectType;
             string typeEnd = structureM.structure[freeCamera.selectedObject].ObjectType;
-            if (typeStart != "Edge" && typeStart != "Metaedge" && typeEnd != "Edge" && typeEnd != "Metaedge")
+            if (structureM.structure[startConnectionObject] == structureM.structure[freeCamera.selectedObject])
+            {
+                Debug.Log("Конечной точкой не может быть начальная");
+            }
+            else if (typeStart != "Edge" && typeStart != "Metaedge" && typeEnd != "Edge" && typeEnd != "Metaedge")
             {
                 //Debug.Log("Присоединение");
 
@@ -149,9 +153,10 @@ namespace nm
             }
             else
             {
-                changeM.ResetChange();
                 Debug.Log("С Edge и Metaedge пока не соединяем");
             }
+            // После установки соединения сбрасываем все выделения.
+            changeM.ResetChange();
         }
 
         // Если сделали двойной клик по объекту.

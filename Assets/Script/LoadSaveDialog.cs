@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.IO;
 using System.Runtime.InteropServices;
-//using System.Windows.Forms;
+using System.Windows.Forms;
 using System;
 
 
@@ -11,8 +11,6 @@ namespace nm
 {
     public class LoadSaveDialog : MonoBehaviour {
 
-        //[DllImport("user32.dll")]
-        //private static extern void OpenFileDialog();
         //[HideInInspector]
         //public bool showDialogLoadMGPL = false;
         //[HideInInspector]
@@ -77,12 +75,6 @@ namespace nm
 
         private void Start()
         {
-            //if (OpenFilesBtn != null)
-            //    OpenFilesBtn.interactable = FileBrowser.canOpenMultipleFiles;
-
-            //if (OpenFoldersBtn != null)
-            //    OpenFoldersBtn.interactable = FileBrowser.canOpenMultipleFolders;
-
             //readerM = Reader.GetInit();
             //logicM = LogicModule.GetInit();
             //predicateM = PredicateModule.GetInit();
@@ -128,61 +120,52 @@ namespace nm
 
         public void SaveFileAs()
         {
-            //SaveFileDialog SaveFile = new SaveFileDialog();
+#if UNITY_EDITOR
+            fileName = EditorUtility.SaveFilePanel("Save the Metagraph json file", "", "", "json");
+#else
+            SaveFileDialog SaveFile = new SaveFileDialog();
+            SaveFile.AddExtension = true;
+            SaveFile.OverwritePrompt = true;
+            SaveFile.RestoreDirectory = true;
+            SaveFile.InitialDirectory = @"C:\\";
+            SaveFile.Title = "Save the Metagraph json file";
+            SaveFile.Filter = "JSON Files (*.json) | *.json |All Files | *.* ";
 
-            //SaveFile.AddExtension = true;
-            //SaveFile.OverwritePrompt = true;
-            //SaveFile.RestoreDirectory = true;
-            //SaveFile.InitialDirectory = @"C:\\";
-            //SaveFile.Title = "Save the Metagraph json file";
-            //SaveFile.Filter = "JSON Files (*.json) | *.json |All Files | *.* ";
-
-            //if (SaveFile.ShowDialog() == DialogResult.OK)
-            //{
-            //    fileName = SaveFile.FileName;
-            //    if (fileName.Length != 0)
-            //    {
-            //        structureM.UnloadingJson(fileName);
-            //    }
-            //}
-
-            //#if UNITY_EDITOR
-            //fileName = EditorUtility.SaveFilePanel("Save the Metagraph json file", "", "", "json");
-            //if (fileName.Length != 0)
-            //{
-            //    structureM.UnloadingJson(fileName);
-            //}
-            //#endif
+            if (SaveFile.ShowDialog() == DialogResult.OK)
+            {
+                fileName = SaveFile.FileName;
+            }
+#endif
+            if (fileName.Length != 0)
+            {
+                structureM.UnloadingJson(fileName);
+            }
         }
 
         public void OpenFile ()
         {
-            //OpenFileDialog OpenFile = new OpenFileDialog();
+#if UNITY_EDITOR
+            fileName = EditorUtility.OpenFilePanel("Please select the Metafile file", "", "json");
+#else
 
-            //OpenFile.RestoreDirectory = true;
-            //OpenFile.InitialDirectory = @"C:\\";
-            //OpenFile.Title = "Please select the Metafile file";
-            //OpenFile.Filter = "JSON Files (*.json) | *.json |All Files | *.* ";
+            OpenFileDialog OpenFile = new OpenFileDialog();
 
-            //if (OpenFile.ShowDialog() == DialogResult.OK)
-            //{
-            //    fileName = OpenFile.FileName;
+            OpenFile.RestoreDirectory = true;
+            OpenFile.InitialDirectory = @"C:\\";
+            OpenFile.Title = "Please select the Metafile file";
+            OpenFile.Filter = "JSON Files (*.json) | *.json |All Files | *.* ";
 
-            //    if (fileName.Length != 0)
-            //    {
-            //        changeM.ResetChange();
-            //        structureM.LoadingJson(fileName);
-            //    }
-            //}
+            if (OpenFile.ShowDialog() == DialogResult.OK)
+            {
+                fileName = OpenFile.FileName;
+            }
+#endif
+            if (fileName.Length != 0)
+            {
+                changeM.ResetChange();
+                structureM.LoadingJson(fileName);
+            }
 
-            //#if UNITY_EDITOR
-            //            fileName = EditorUtility.OpenFilePanel("Please select the Metafile file", "", "json");
-            //            if (fileName.Length != 0)
-            //            {
-            //                changeM.ResetChange();
-            //                structureM.LoadingJson(fileName);
-            //            }
-            //#endif
         }
 
 
