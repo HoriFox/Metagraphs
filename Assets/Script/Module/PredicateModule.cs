@@ -131,7 +131,7 @@ namespace nm
                         // Не делаем связь с Edge и MetaEdge
                         if (part.Value.Static) continue;
                         Vector3 childPosition = part.Value.GetPosition(0);
-                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(true, position, childPosition, m_structure.color, Name));
+                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(true, position, childPosition, m_structure.Eo, m_structure.color, Name));
                     }
                 }
                 else
@@ -183,10 +183,10 @@ namespace nm
 
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Композитор
                     // Если есть направленная связь, то самое первое - начальный объект.
-                    if (m_structure.Eo)
-                    {
-                        postionList.Add(m_structureDict[m_structure.Start].GetPosition(0));
-                    }
+                    //if (m_structure.Eo)
+                    //{
+                    //    postionList.Add(m_structureDict[m_structure.Start].GetPosition(0));
+                    //}
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <<
 
                     if (m_structure.Position.Length == 0)
@@ -218,10 +218,10 @@ namespace nm
                     }
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <<
                     // Если есть направленная связь, то самое последнее - конечный объект.
-                    if (m_structure.Eo)
-                    {
-                        postionList.Add(m_structureDict[m_structure.End].GetPosition(0));
-                    }
+                    //if (m_structure.Eo)
+                    //{
+                    //    postionList.Add(m_structureDict[m_structure.End].GetPosition(0));
+                    //}
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Билдер
                     int n = 0;
                     Vector3 lastPosition = Vector3.zero;
@@ -237,7 +237,7 @@ namespace nm
                         }
                         nextPosition = position;
                         // TO DO. Сделать свойство isArc у связи вариативным: прямая, дуга.
-                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(m_structure.Arc, false, lastPosition, nextPosition, m_structure.color, Name, isSimple: true));
+                        m_structure.gameObject.AddRange(InitObject.Instance.InitLine(m_structure.Arc, m_structure.HeightArc, m_structure.AngleArc, false, lastPosition, nextPosition, m_structure.Eo, m_structure.color, Name, isSimple: true));
                         lastPosition = nextPosition;
                         n++;
                     }

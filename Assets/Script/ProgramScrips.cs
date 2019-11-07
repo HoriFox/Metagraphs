@@ -29,6 +29,11 @@ namespace nm
             GetComponent<LoadSaveDialog>().SaveFile();
         }
 
+        public void SaveAs()
+        {
+            GetComponent<LoadSaveDialog>().SaveFileAs();
+        }
+
         // Загрузка mgpl файла.
         public void LoadFile()
         {
@@ -46,6 +51,7 @@ namespace nm
             InteractionModule.GetInit().TargetObjectClean();
             ChangeModule.Instance.ResetChange();
             structureM.NewStructure();
+            GetComponent<LoadSaveDialog>().Clear();
         }
         // Назад.
         //public void Backward()

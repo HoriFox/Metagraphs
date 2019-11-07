@@ -13,8 +13,8 @@ namespace nm
         private static GUIChangeModule init;
 
 
-        public Text nameCurrentTarget;
-        public Text typeTarget;
+        //public Text nameCurrentTarget;
+        //public Text typeTarget;
 
         //public InputField nameStart;
         //public InputField nameEnd;
@@ -101,9 +101,9 @@ namespace nm
 
         public void OpenInformation()
         {
-            nameCurrentTarget.text = changeM.saveSelectName;
-            Structure structure = structureM.structure[changeM.saveSelectName];
-            typeTarget.text = structure.ObjectType;
+            //nameCurrentTarget.text = changeM.saveSelectName;
+            //Structure structure = structureM.structure[changeM.saveSelectName];
+            //typeTarget.text = structure.ObjectType;
             ScrollViewHelper viewHelperParent = scrollViewParent.GetComponent<ScrollViewHelper>();
             ScrollViewHelper viewHelperChild = scrollViewChild.GetComponent<ScrollViewHelper>();
             viewHelperParent.ResetList();
@@ -112,19 +112,19 @@ namespace nm
             viewHelperChild.ShowList(structureM.structure[changeM.saveSelectName].ChildStructuresKeys);
         }
 
-        public void CheckChange()
-        {
+        //public void CheckChange()
+        //{
             //if (startName != null && startName != nameCurrentTarget.text)
             //{
             //    structureM.EditNodeData(startName, nameCurrentTarget.text);
             //}
-        }
+        //}
 
         // Добавить выбранное окружение.
-        public void AddEnvironment()
-        {
-            Debug.Log("Добавить в папку");
-        }
+        //public void AddEnvironment()
+        //{
+        //    Debug.Log("Добавить в папку");
+        //}
 
         //Не могу поставить на префаб данную функцию.
         //// Удалить выбранное окружение.

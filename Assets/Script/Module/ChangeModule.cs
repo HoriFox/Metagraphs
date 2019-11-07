@@ -15,14 +15,38 @@ namespace nm
 
         private InteractionModule interactionM;
 
-        public GameObject changeTransform;
-        public GameObject changeInformation;
+        public GameObject changePanel;
+        //public GameObject changeTransform;
+        //public GameObject changeInformation;
+
+        public InputField nameCurrentTarget;
+        //public Text typeTarget;
+        public GameObject nameCurrentWarning;
 
         public InputField inputFieldX;
         public InputField inputFieldY;
         public InputField inputFieldZ;
 
-        public Transform visualStyleToggle;
+        public Text redValue;
+        public Text greenValue;
+        public Text blueValue;
+
+        public Slider redSlider;
+        public Slider greenSlider;
+        public Slider blueSlider;
+
+        public Toggle typeLine;
+
+        public Toggle transformChangeButton;
+        public Toggle edgeChangeButton;
+
+        public Text arcAngleValue;
+        public Text factorBendingValue;
+
+        public Slider factorBendingSlider;
+        public Slider arcAngleSlider;
+
+        //public Transform visualStyleToggle;
 
         private GUIChangeModule guiChangeM;
         private ResourceManager resourceM;
@@ -30,7 +54,10 @@ namespace nm
         [HideInInspector] public string saveSelectName = null;
 
         private Vector3 SavePosition = new Vector3(0f, 0f, 0f);
-        private GameObject markerObject = null;
+        public GameObject markerObject;
+        //public GameObject markerObjectCenter;
+        //private float timeToHideMarker = 0f;
+        //private bool momentHideMarkerCenter = false;
 
         private void Awake()
         {
@@ -51,18 +78,21 @@ namespace nm
             resourceM = ResourceManager.GetInstance();
             guiChangeM = GUIChangeModule.GetInit();
 
-            markerObject = Instantiate(resourceM.GetPrefab("LabelPrefab"), positionSelected, Quaternion.Euler(0f, 0f, 0f));
-            markerObject.SetActive(false);
+            //markerObject = Instantiate(resourceM.GetPrefab("Marker"), positionSelected, Quaternion.Euler(0f, 0f, 0f));
+            //markerObject.SetActive(false);
         }
 
         // ПОДТВЕРЖДЕНИЕ ИЗМЕНЕНИЯ ГРАФА.
         public void UpdateChange()
         {
             // Если позиции действительно сменились, то задаём их.
-            if (saveSelectName != null && interactionM.targetObject.GetPosition(0) != positionSelected && positionSelected != new Vector3(0f, 0f, 0f))
+            if (!interactionM.targetObject.Static)
             {
-                interactionM.targetObject.Position[0] = positionSelected;
-                RebuildObject("rebuild");
+                if (saveSelectName != null && interactionM.targetObject.GetPosition(0) != positionSelected && positionSelected != new Vector3(0f, 0f, 0f))
+                {
+                    interactionM.targetObject.Position[0] = positionSelected;
+                    RebuildObject("rebuild");
+                }
             }
         }
 
@@ -128,12 +158,30 @@ namespace nm
 
         public void ShowChangeMenu(string name)
         {
-            //interactionM.isPanelActive = true;
-            changeInformation.SetActive(true);
-            //Если элемент не статический (не Edge и Metaedge).
-            if (!structureM.structure[name].Static)
+            //Debug.Log(name);
+            nameCurrentTarget.text = name;
+
+            changePanel.SetActive(true);
+            transformChangeButton.isOn = true;
+
+            //Если элемент статический (Edge и Metaedge).
+            if (structureM.structure[name].Static)
             {
-                changeTransform.SetActive(true);
+                inputFieldX.interactable = false;
+                inputFieldY.interactable = false;
+                inputFieldZ.interactable = false;
+                typeLine.interactable = true;
+                edgeChangeButton.interactable = true;
+
+                typeLine.isOn = structureM.structure[name].Arc;
+            }
+            else
+            {
+                inputFieldX.interactable = true;
+                inputFieldY.interactable = true;
+                inputFieldZ.interactable = true;
+                typeLine.interactable = false;
+                edgeChangeButton.interactable = false;
             }
         }
 
@@ -149,11 +197,12 @@ namespace nm
             //interactionM.isPanelActive = false;
             saveSelectName = null;
             freeCamera.selectedObject = null;
-            changeTransform.SetActive(false);
-            guiChangeM.CheckChange();
-            changeInformation.SetActive(false);
+            changePanel.SetActive(false);
+            nameCurrentWarning.SetActive(false);
+            //guiChangeM.CheckChange();
             markerObject.SetActive(false);
             positionSelected = new Vector3(0f, 0f, 0f);
+
             if (interactionM.targetObject != null && interactionM.targetObject.Static)
             {
                 foreach (var part in interactionM.targetObject.gameObject)
@@ -166,9 +215,34 @@ namespace nm
 
         void Update()
         {
-            // Если сейчас что-то выделено и на нём висит красный Маркер.
-            if (markerObject != null)
+            // DO TO. KEY
+            if (Input.GetKeyDown(KeyCode.Delete) && interactionM.isNowSelected)
             {
+                RebuildObject("delete");
+                ResetChange();
+            }
+            // DO TO. KEY
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                ResetChange();
+            }
+
+            // Если сейчас что-то выделено и на нём висит красный Маркер.
+            if (markerObject.activeInHierarchy)
+            {
+                //if (momentHideMarkerCenter)
+                //{
+                //    if (Time.time > timeToHideMarker)
+                //    {
+                //        markerObjectCenter.SetActive(true);
+                //        momentHideMarkerCenter = false;
+                //    }
+                //    else
+                //    {
+                //        markerObjectCenter.SetActive(false);
+                //    }
+                //}
+
                 Vector3 transformMarker = markerObject.transform.localPosition;
                 inputFieldX.text = transformMarker.x.ToString("0.00");
                 inputFieldY.text = transformMarker.y.ToString("0.00");
@@ -185,21 +259,11 @@ namespace nm
                     SavePosition = transformMarker;
                     positionSelected = SavePosition;
                 }
+
                 // DO TO. KEY
                 if (Input.GetKeyDown(KeyCode.Return) && interactionM.isNowSelected)
                 {
                     UpdateChange();
-                }
-                // DO TO. KEY
-                if (Input.GetKeyDown(KeyCode.Delete) && interactionM.isNowSelected)
-                {
-                    RebuildObject("delete");
-                    ResetChange();
-                }
-                // DO TO. KEY
-                if (Input.GetKeyDown(KeyCode.Escape))
-                {
-                    ResetChange();
                 }
             }
             // Одноразовое включение заселекченного объекта.
@@ -213,15 +277,25 @@ namespace nm
                     {
                         markerObject.transform.position = interactionM.targetObject.GetPosition(0);
                         markerObject.SetActive(true);
+                        //markerObjectCenter.SetActive(true);
                     }
                     else
                     {
+                        markerObject.transform.localPosition = Vector3.zero;
                         foreach (var part in interactionM.targetObject.gameObject)
                         {
                             part.GetComponent<Outline>().enabled = true;
                         }
                     }
                     guiChangeM.OpenInformation();
+
+                    redSlider.value = interactionM.targetObject.color.r;
+                    greenSlider.value = interactionM.targetObject.color.g;
+                    blueSlider.value = interactionM.targetObject.color.b;
+
+
+                    factorBendingSlider.value = interactionM.targetObject.HeightArc;
+                    arcAngleSlider.value = interactionM.targetObject.AngleArc;
                 }
                 else
                 {
@@ -245,15 +319,166 @@ namespace nm
         public void UpdatePositionFieldY(string value)
         {
             Vector3 currentPostion = markerObject.transform.localPosition;
-            currentPostion.y = float.Parse(value);
-            markerObject.transform.localPosition = currentPostion;
+            float? valueY = float.Parse(value);
+            if (valueY != null)
+            {
+                currentPostion.y = valueY.GetValueOrDefault();
+                markerObject.transform.localPosition = currentPostion;
+            }
         }
 
         public void UpdatePositionFieldZ(string value)
         {
             Vector3 currentPostion = markerObject.transform.localPosition;
-            currentPostion.z = float.Parse(value);
-            markerObject.transform.localPosition = currentPostion;
+            float? valueZ = float.Parse(value);
+            if (valueZ != null)
+            {
+                currentPostion.z = valueZ.GetValueOrDefault();
+                markerObject.transform.localPosition = currentPostion;
+            }
+        }
+
+        public void UpdateFactorBending(float value)
+        {
+            factorBendingValue.text = value.ToString("0.0");
+
+            Structure updateObject = structureM.structure[freeCamera.selectedObject];
+            structureM.structure[freeCamera.selectedObject].HeightArc = value;
+
+            DeleteObject(updateObject.gameObject);
+            predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+        }
+
+        public void UpdateArcAngle(float value)
+        {
+            arcAngleValue.text = value.ToString("0.");
+
+            Structure updateObject = structureM.structure[freeCamera.selectedObject];
+            structureM.structure[freeCamera.selectedObject].AngleArc = value;
+
+            DeleteObject(updateObject.gameObject);
+            predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+        }
+
+        public void UpdateColorRed(float value)
+        {
+            //momentHideMarkerCenter = true;
+            //timeToHideMarker = Time.time + 1f;
+            Structure structure = interactionM.targetObject;
+            Color32 currentColor = structure.color;
+            currentColor.r = (byte)value;
+            redValue.text = value.ToString("0.");
+            foreach (var part in structure.gameObject)
+            {
+                part.GetComponent<Renderer>().material.color = currentColor;
+            }
+            interactionM.targetObject.color = currentColor;
+        }
+
+        public void UpdateColorGreen(float value)
+        {
+            //momentHideMarkerCenter = true;
+            //timeToHideMarker = Time.time + 1f;
+            Structure structure = interactionM.targetObject;
+            Color32 currentColor = structure.color;
+            currentColor.g = (byte)value;
+            greenValue.text = value.ToString("0.");
+            foreach (var part in structure.gameObject)
+            {
+                part.GetComponent<Renderer>().material.color = currentColor;
+            }
+            interactionM.targetObject.color = currentColor;
+        }
+
+        public void UpdateColorBlue(float value)
+        {
+            //momentHideMarkerCenter = true;
+            //timeToHideMarker = Time.time + 1f;
+            Structure structure = interactionM.targetObject;
+            Color32 currentColor = structure.color;
+            currentColor.b = (byte)value;
+            blueValue.text = value.ToString("0.");
+            foreach (var part in structure.gameObject)
+            {
+                part.GetComponent<Renderer>().material.color = currentColor;
+            }
+            interactionM.targetObject.color = currentColor;
+        }
+
+        //IEnumerator MomentHide ()
+        //{
+        //    markerObject.SetActive(false);
+        //    yield return new WaitForSecondsRealtime(1f);
+        //    markerObject.SetActive(true);
+        //}
+
+        public void UpdateNameObject(string value)
+        {
+            if (value != interactionM.targetObject.Name && value != "")
+            {
+                if (structureM.structure.ContainsKey(value))
+                {
+                    // Имя уже существует. Ошибка.
+                    nameCurrentWarning.SetActive(true);
+                    return;
+                }
+                else
+                {
+                    Structure intermediate = interactionM.targetObject;
+
+                    foreach (var part in intermediate.ChildStructures)
+                    {
+                        // Для корректного отображения в редакторе связей.
+                        for (int i = 0; i < part.Value.ParentStructuresKeys.Length; i++)
+                        {
+                            if (part.Value.ParentStructuresKeys[i] == intermediate.Name)
+                            {
+                                part.Value.ParentStructuresKeys[i] = value;
+                            }
+                        }
+
+                        part.Value.ParentStructures.Remove(intermediate.Name);
+                        part.Value.ParentStructures.Add(value, intermediate);
+                    }
+
+                    foreach (var part in intermediate.ParentStructures)
+                    {
+                        // Для корректного отображения в редакторе связей.
+                        for (int i = 0; i < part.Value.ChildStructuresKeys.Length; i++)
+                        {
+                            if (part.Value.ChildStructuresKeys[i] == intermediate.Name)
+                            {
+                                part.Value.ChildStructuresKeys[i] = value;
+                            }
+                        }
+
+                        part.Value.ChildStructures.Remove(intermediate.Name);
+                        part.Value.ChildStructures.Add(value, intermediate);
+                    }
+
+                    structureM.structure.Remove(intermediate.Name);
+
+                    intermediate.Name = value;
+
+                    freeCamera.selectedObject = value;
+                    saveSelectName = value;
+
+                    structureM.structure.Add(value, intermediate);
+
+                    DeleteObject(intermediate.gameObject);
+                    predicateM.TactBuild(intermediate.Name, intermediate.ObjectType);
+                }
+            }
+            nameCurrentWarning.SetActive(false);
+        }
+
+        public void UpdateArc(bool value)
+        {
+            Structure updateObject = structureM.structure[freeCamera.selectedObject];
+            structureM.structure[freeCamera.selectedObject].Arc = value;
+
+            DeleteObject(updateObject.gameObject);
+            predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
         }
 
     }

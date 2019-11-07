@@ -21,8 +21,11 @@ namespace nm
         public string Value = null;
 
         public bool Arc = false;
+        public float HeightArc = -1f;
+        public float AngleArc = -1f;
+
         public bool Static = false;
-        public float? Radius = null;
+        //public float? Radius = null;
 
         public string[] ParentStructuresKeys = null;
         public string[] ChildStructuresKeys = null;
@@ -234,17 +237,17 @@ namespace nm
             }
         }
 
-        public void EditNodeData(string name, string newName = null)
-        {
-            // Если что-то изменилось.
-            if (name != newName)
-            {
-                AddNode(newName);
-                structure[newName] = structure[name];
-                structure[newName].Name = newName;
-                structure.Remove(name);
-            }
-        }
+        //public void EditNodeData(string name, string newName = null)
+        //{
+        //    // Если что-то изменилось.
+        //    if (name != newName)
+        //    {
+        //        AddNode(newName);
+        //        structure[newName] = structure[name];
+        //        structure[newName].Name = newName;
+        //        structure.Remove(name);
+        //    }
+        //}
 
         public Dictionary<string, Structure> GetParent(string nameNode)
         {

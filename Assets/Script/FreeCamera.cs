@@ -209,24 +209,26 @@ namespace nm
                     }
                 }
 
-                // Приближение и удаление с помощью колёсика
-                transform.Translate(0, 0, Input.GetAxis("Mouse ScrollWheel") * zoomSpeed, Space.Self);
-
                 // При вращении или удерживании кнопки можно настроить дальность.
                 if (m_rotateAroud || Input.GetKey(EditorMenu.keys[7]))
                 {
                     CenterRotMarker.position = targetPosition;
                     CenterRotMarker.rotation = standartZero;
 
-                    if (Input.GetAxis("Mouse ScrollWheel") > 0)
+                    if (Input.GetAxis("Mouse ScrollWheel") < 0)
                     {
                         offset.z += zoom;
                     }
-                    else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+                    else if (Input.GetAxis("Mouse ScrollWheel") > 0)
                     {
                         offset.z -= zoom;
                     }
                     offset.z = Mathf.Clamp(offset.z, Mathf.Abs(zoomMin), float.MaxValue);
+                }
+                else
+                {
+                    // Приближение и удаление с помощью колёсика
+                    transform.Translate(0, 0, Input.GetAxis("Mouse ScrollWheel") * zoomSpeed, Space.Self);
                 }
 
                 // В момент отпускания мы убираем метку центра.

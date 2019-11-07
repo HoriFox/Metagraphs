@@ -134,7 +134,7 @@ namespace nm
         //                case ")":
         //                    nowLevel--; // Понижаем уровень скобок.
         //                    structureM.AddNodeData(nowNameNode, objectType: nowType);
-        //                    structureM.AddEnvironment(nowNameNode, childNames: namesChild);
+        //                    structureM.AddNodeData(nowNameNode, childNames: namesChild);
         //                    // Если это рёбра, то это статические объекты. Другими словами, самостоятельные.
         //                    if (nowType == "Edge" || nowType == "Metaedge")
         //                    {

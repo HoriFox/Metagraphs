@@ -40,67 +40,120 @@ namespace nm
             return objectVar;
         }
 
-        private Vector3 GetPerpendicular(Vector3 inputVector, float factorAdditional)
+        Vector3 SampleParabola(Vector3 start, Vector3 end, float height, float angle, float t)
         {
-            Vector3 rotate = new Vector3(-inputVector.y, inputVector.x, inputVector.z);
-            rotate = rotate.normalized * factorAdditional;
-            Vector3 offset = rotate + inputVector / 2;
-            return offset;
+            float parabolicT = t * 2 - 1;
+            //Когда Y старт и Y конец находятся практически на одном уровне, то упрощаем работу, иначе приходится ложнее.
+            if (Mathf.Abs(start.y - end.y) < 0.1f)
+            {
+                // начало и конец примерно на одном уровне, представьте, что они более простое решение с меньшим количеством шагов
+                Vector3 travelDirection = end - start;
+                Vector3 result = start + t * travelDirection;
+                result += Quaternion.AngleAxis(angle, travelDirection) * new Vector3(0, (-parabolicT * parabolicT + 1) * height, 0);
+                return result;
+
+            }
+            else
+            {
+                // начало и конец не уровень, становится все сложнее
+                Vector3 travelDirection = end - start;
+                Vector3 levelDirecteion = end - new Vector3(start.x, end.y, start.z);
+                Vector3 right = Vector3.Cross(travelDirection, levelDirecteion);
+                Vector3 up = Quaternion.AngleAxis(angle, travelDirection) * Vector3.Cross(right, travelDirection);
+                if (end.y > start.y) up = -up;
+                Vector3 result = start + t * travelDirection;
+                result += ((-parabolicT * parabolicT + 1) * height) * up.normalized;
+                return result;
+            }
         }
 
-        public Vector3 additional = new Vector3();
-
         [Range(3, 20)]
-        public int quality = 6;
+        public int quality = 10;
 
-        [Range(-10.0f, 10.0f)]
-        public float factorAdditional = 5.0f;
+        [Range(0, 10)]
+        public int height;
 
-        public List<GameObject> InitLine(bool isArc, bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, Color32 color, string _name, Transform parent = null, bool isSimple = false)
+        [Range(0, 360)]
+        public int angle; // Поворот кривой линии.
+
+        public List<GameObject> InitLine(bool isArc, float heightArc, float angleArc, bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, bool isDirected, Color32 color, string _name, Transform parent = null, bool isSimple = false)
         {
             List<GameObject> gameObject;
             if (isArc)
             {
                 gameObject = new List<GameObject>();
 
-                float dividerPhase = 1.0f / quality;
-                float currentPhase = 0.0f;
+                float height = (heightArc == -1) ? Vector3.Distance(positionFirst, positionSecond) * 0.3f : heightArc;
+                float angle = (angleArc == -1) ? 0 : angleArc;
 
-                additional = GetPerpendicular(positionSecond - positionFirst, factorAdditional) + positionFirst;
-
+                bool isLastPhase = false;
                 Vector3 lastPoint = positionFirst;
-
-                int numberPhase = 0;
-                while (numberPhase <= quality)
+                for (float i = 1; i < quality + 1; i++)
                 {
-                    Vector3 m1 = Vector3.Lerp(positionFirst, additional, currentPhase);
-                    Vector3 m2 = Vector3.Lerp(additional, positionSecond, currentPhase);
-
-                    Vector3 nextPoint = Vector3.Lerp(m1, m2, currentPhase);
-                    if (numberPhase != 0)
+                    if (i == quality)
                     {
-                        // "ArcEdge_" + _name + "_" + numberPhase
-                        gameObject.AddRange(InitLine(false, lastPoint, nextPoint, color, _name, isSimple: true));
+                        isLastPhase = true;
                     }
 
-                    lastPoint = nextPoint;
+                    Vector3 nextPoint = SampleParabola(positionFirst, positionSecond, height, angle, i / quality);
+                    //Gizmos.color = i % 2 == 0 ? Color.blue : Color.green;
+                    //Gizmos.DrawLine(lastP, p);
 
-                    currentPhase += dividerPhase;
-                    numberPhase++;
+                    gameObject.AddRange(InitLine(false, lastPoint, nextPoint, isDirected, color, _name, isSimple: true, isLastPart: isLastPhase));
+
+                    lastPoint = nextPoint;
                 }
             }
             else
             {
                 gameObject = new List<GameObject>();
-                gameObject.AddRange(InitLine(isLGraph, positionFirst, positionSecond, color, _name, parent, isSimple));
+                gameObject.AddRange(InitLine(isLGraph, positionFirst, positionSecond, isDirected, color, _name, parent, isSimple));
             }
             return gameObject;
         }
 
-        public List<GameObject> InitLine(bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, Color32 color, string _name, Transform parent = null, bool isSimple = false)
+        public List<GameObject> InitLine(bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, bool isDirected, Color32 color, string _name, Transform parent = null, bool isSimple = false, bool isLastPart = true)
         {
             Transform parentUse = parent ?? parentStandart;
-            List<GameObject> gameObjects = CreateLine(isLGraph, positionFirst, positionSecond, color, _name, parentUse, isSimple);
+            List<GameObject> gameObjects = new List<GameObject>();
+            if (!isSimple)
+            {
+                GameObject sphereFirst = Instantiate(resourceM.GetPrefab("SpherePrefab"), positionFirst, Quaternion.identity, parentUse);
+                sphereFirst.transform.localScale = (isLGraph) ? scaleLGraph : scaleLink;
+                sphereFirst.GetComponent<Renderer>().material.color = new Color32(color.r, color.g, color.b, color.a);
+                gameObjects.Add(sphereFirst);
+
+                GameObject sphereSecond = Instantiate(resourceM.GetPrefab("SpherePrefab"), positionSecond, Quaternion.identity, parentUse);
+                sphereSecond.transform.localScale = (isLGraph) ? scaleLGraph : scaleLink;
+                sphereSecond.GetComponent<Renderer>().material.color = new Color32(color.r, color.g, color.b, color.a);
+                gameObjects.Add(sphereSecond);
+            }
+
+            GameObject line = Instantiate(resourceM.GetPrefab("LinePrefab"), Vector3.zero, Quaternion.identity, parentUse);
+            line.transform.localScale = (isLGraph) ? scaleLGraph : scaleLink;
+            line.GetComponent<Renderer>().material.color = new Color32(color.r, color.g, color.b, color.a);
+
+            Vector3 offset = positionSecond - positionFirst;
+            Vector3 position = positionFirst + (offset / 2.0f);
+            line.transform.position = position;
+            line.transform.LookAt(positionFirst);
+            Vector3 localScale = line.transform.localScale;
+            localScale.z = (positionSecond - positionFirst).magnitude;
+            line.transform.localScale = localScale;
+            gameObjects.Add(line);
+
+            // Если это последний участок, то разрешаем создать стрелку, если нужно.
+            if (isDirected && isLastPart)
+            {
+                GameObject array = Instantiate(resourceM.GetPrefab("Arrow"), positionSecond, Quaternion.identity, parentUse);
+                array.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+                array.transform.localRotation = line.transform.localRotation;
+                array.transform.Rotate(new Vector3(-90f, 0, 0));
+                array.transform.position = GetPositionBetween(positionFirst, positionSecond, 0.35f);
+                array.GetComponent<Renderer>().material.color = new Color32(color.r, color.g, color.b, color.a);
+                gameObjects.Add(array);
+            }
+
             foreach (var part in gameObjects)
             {
                 part.name = _name;
@@ -109,46 +162,16 @@ namespace nm
             return gameObjects;
         }
 
-        private List<GameObject> CreateLine(bool isLGraph, Vector3 firstPoint, Vector3 secondPoint, Color32 color, string _name, Transform parent, bool isSimple)
+        public Vector3 GetPositionBetween (Vector3 A, Vector3 B, float Rcb)
         {
-            List<GameObject> gameObjects = new List<GameObject>();
-            if (!isSimple)
-            {
-                gameObjects.Add(InitSphere(isLGraph, firstPoint, color, parent));
-                gameObjects.Add(InitSphere(isLGraph, secondPoint, color, parent));
-            }
-            gameObjects.Add(InitOneLine(isLGraph, firstPoint, secondPoint, color, _name, parent));
-            return gameObjects;
+            float Rab = Mathf.Sqrt(Mathf.Pow((B.x - A.x), 2)  + Mathf.Pow((B.y - A.y), 2) + Mathf.Pow((B.z - A.z), 2));
+            float k = Rcb / Rab;
+            float Xc = B.x + (A.x - B.x) * k;
+            float Yc = B.y + (A.y - B.y) * k;
+            float Zc = B.z + (A.z - B.z) * k;
+
+            return new Vector3(Xc, Yc, Zc);
         }
-        private GameObject InitSphere(bool isLGraph, Vector3 point, Color32 color, Transform parent)
-        {
-            GameObject sphere = Instantiate(resourceM.GetPrefab("SpherePrefab"), point, Quaternion.identity, parent);
-            sphere = SetProperties(isLGraph, sphere, color);
-            return sphere;
-        }
-        private GameObject InitOneLine(bool isLGraph, Vector3 beginPoint, Vector3 endPoint, Color32 color, string _name, Transform parent)
-        {
-            GameObject line = Instantiate(resourceM.GetPrefab("LinePrefab"), Vector3.zero, Quaternion.identity, parent);
-            line = SetProperties(isLGraph, line, color);
-            //line.GetComponentInChildren<TextMesh>().text = _name;
-            UpdateLinePosition(line, beginPoint, endPoint);
-            return line;
-        }
-        private GameObject SetProperties(bool isLGraph, GameObject obj, Color32 color)
-        {
-            obj.transform.localScale = (isLGraph) ? scaleLGraph : scaleLink;
-            obj.GetComponent<Renderer>().material.color = new Color32(color.r, color.g, color.b, color.a);
-            return obj;
-        }
-        private void UpdateLinePosition(GameObject lineGraph, Vector3 beginPoint, Vector3 endPoint)
-        {
-            Vector3 offset = endPoint - beginPoint;
-            Vector3 position = beginPoint + (offset / 2.0f);
-            lineGraph.transform.position = position;
-            lineGraph.transform.LookAt(beginPoint);
-            Vector3 localScale = lineGraph.transform.localScale;
-            localScale.z = (endPoint - beginPoint).magnitude;
-            lineGraph.transform.localScale = localScale;
-        }
+
     }
 }

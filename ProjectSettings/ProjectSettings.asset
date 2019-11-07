@@ -516,11 +516,19 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLWasmStreaming: 0
   scriptingDefineSymbols:
-    1: CROSS_PLATFORM_INPUT
-    4: CROSS_PLATFORM_INPUT;MOBILE_INPUT
-    7: CROSS_PLATFORM_INPUT;MOBILE_INPUT
-    14: MOBILE_INPUT
+    1: CROSS_PLATFORM_INPUT;CT_FB
+    4: CROSS_PLATFORM_INPUT;MOBILE_INPUT;CT_FB
+    7: CROSS_PLATFORM_INPUT;MOBILE_INPUT;CT_FB
+    13: CT_FB
+    14: MOBILE_INPUT;CT_FB
     17: MOBILE_INPUT
+    19: CT_FB
+    21: CT_FB
+    25: CT_FB
+    26: CT_FB
+    27: CT_FB
+    28: CT_FB
+    29: CT_FB
   platformArchitecture: {}
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}
@@ -532,7 +540,7 @@ PlayerSettings:
   gcIncremental: 0
   gcWBarrierValidation: 0
   apiCompatibilityLevelPerPlatform:
-    Standalone: 6
+    Standalone: 3
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: Metagraphs
@@ -593,6 +601,7 @@ PlayerSettings:
       daydreamIconForeground: {fileID: 0}
       daydreamIconBackground: {fileID: 0}
   cloudServicesEnabled:
+    Collab: 1
     UNet: 1
   luminIcon:
     m_Name: 
