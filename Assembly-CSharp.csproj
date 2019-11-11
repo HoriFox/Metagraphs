@@ -67,7 +67,9 @@
     <Compile Include="Assets\ButtonPanel.cs" />
     <Compile Include="Assets\ButtonSwitch.cs" />
     <Compile Include="Assets\ComputationModule.cs" />
+    <Compile Include="Assets\DemoLoadObj.cs" />
     <Compile Include="Assets\DetailStructure.cs" />
+    <Compile Include="Assets\FastObjImporter.cs" />
     <Compile Include="Assets\HeadbandCheck.cs" />
     <Compile Include="Assets\RotateCompass.cs" />
     <Compile Include="Assets\Script\AutoText.cs" />

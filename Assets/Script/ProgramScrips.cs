@@ -45,13 +45,19 @@ namespace nm
         //    GetComponent<LoadSaveDialog>().showDialogLoadJSON = true;
         //}
         // Очистка.
+
+        public void LoadModel()
+        {
+            GetComponent<LoadSaveDialog>().OpenModel();
+        }
+
         public void Clear()
         {
             SceneCleaning.Instance.Clean();
             InteractionModule.GetInit().TargetObjectClean();
             ChangeModule.Instance.ResetChange();
             structureM.NewStructure();
-            GetComponent<LoadSaveDialog>().Clear();
+            LoadSaveDialog.GetInstance().Clear();
         }
         // Назад.
         //public void Backward()

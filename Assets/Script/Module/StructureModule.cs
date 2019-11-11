@@ -17,6 +17,11 @@ namespace nm
         public bool Eo = false;
         public string Start = null;
         public string End = null;
+
+        public string NameModel = null;
+        public float ScaleModel = 0.5f;
+        public float ScaleSelectMarker = 0.6f;
+
         public string TypeValue = null;
         public string Value = null;
 
@@ -99,6 +104,15 @@ namespace nm
                     structure[part.Name] = part;
                 }
             }
+
+            // TO DO Возможно после билда не заработает.
+            string pathTemp = Application.dataPath + "/MetagraphEditorTemp";
+            string homeLocation = Path.GetDirectoryName(LoadSaveDialog.GetInstance().fileName);
+            if (!Directory.Exists(pathTemp))
+            {
+                Directory.CreateDirectory(pathTemp);
+            }
+
             foreach (var part in structure)
             {
                 foreach (var parent in part.Value.ParentStructuresKeys)
@@ -122,6 +136,14 @@ namespace nm
                 if (part.Value.End == string.Empty)
                 {
                     part.Value.End = null;
+                }
+                if (part.Value.NameModel != null && part.Value.NameModel != string.Empty)
+                {
+                    File.Copy(homeLocation + "/" + part.Value.NameModel, pathTemp + "/" + part.Value.NameModel, true);
+                }
+                else
+                {
+                    part.Value.NameModel = null;
                 }
             }
 

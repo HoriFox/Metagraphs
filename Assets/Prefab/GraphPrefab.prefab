@@ -58,6 +58,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -117,6 +118,8 @@ GameObject:
   - component: {fileID: 135306745591127080}
   - component: {fileID: 23207760731120982}
   - component: {fileID: 114547038605805440}
+  - component: {fileID: 5723815934242255840}
+  - component: {fileID: 5114195880786115806}
   m_Layer: 9
   m_Name: GraphPrefab
   m_TagString: Metagraph
@@ -185,6 +188,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -210,5 +214,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedContainer: {fileID: 0}
+  sizeSelectMarker: 0.6
   text: 
   arrayShow: 1
+--- !u!114 &5723815934242255840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1682843200641568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c39578d48f5e6243ab73df84b105a9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!64 &5114195880786115806
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1682843200641568}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Convex: 0
+  m_CookingOptions: 14
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}

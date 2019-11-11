@@ -116,7 +116,6 @@ namespace nm
             public void Create()
             {
                 Vector3 position = m_structure.GetPosition(0);
-                Vector3 size = new Vector3(0.5f, 0.5f, 0.5f);
                 // Если альфа канал 0, то цвет не установлен.
                 if (m_structure.color.a == 0)
                 {
@@ -136,8 +135,10 @@ namespace nm
                 }
                 else
                 {
+                    float scaleModel = m_structure.ScaleModel;
+                    Vector3 size = new Vector3(scaleModel, scaleModel, scaleModel);
                     // Вершина-сфера.
-                    m_structure.gameObject.Add(InitObject.Instance.InitGraph(position, size, m_structure.color, Name));
+                    m_structure.gameObject.Add(InitObject.Instance.InitGraph(position, size, m_structure.color, Name, m_structure.NameModel, m_structure.ScaleSelectMarker));
                 }
             }
             public void SetColor(Color32 colorNew)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
 
 namespace nm
 {
@@ -41,6 +42,7 @@ namespace nm
         public Toggle typeLine;
 
         public Toggle transformChangeButton;
+        public Toggle graphChangeButton;
         public Toggle edgeChangeButton;
 
         public Text arcAngleValue;
@@ -48,6 +50,13 @@ namespace nm
 
         public Slider factorBendingSlider;
         public Slider arcAngleSlider;
+
+        public Text modelValue;
+        public Text scaleModelValue;
+        public Text scaleSelectorMarkerValue;
+
+        public Slider sliderScaleModel;
+        public Slider sliderScaleSelectorMarker;
 
         //public Transform visualStyleToggle;
 
@@ -178,6 +187,7 @@ namespace nm
                 inputFieldY.interactable = false;
                 inputFieldZ.interactable = false;
                 edgeChangeButton.interactable = true;
+                graphChangeButton.interactable = false;
             }
             else
             {
@@ -185,6 +195,7 @@ namespace nm
                 inputFieldY.interactable = true;
                 inputFieldZ.interactable = true;
                 edgeChangeButton.interactable = false;
+                graphChangeButton.interactable = true;
             }
         }
 
@@ -284,7 +295,9 @@ namespace nm
                     {
                         markerObject.transform.position = interactionM.targetObject.GetPosition(0);
                         markerObject.SetActive(true);
-                        //markerObjectCenter.SetActive(true);
+
+                        float scale = interactionM.targetObject.gameObject[0].GetComponent<TooltipText>().sizeSelectMarker;
+                        markerObject.transform.localScale = new Vector3(scale, scale, scale);
                     }
                     else
                     {
@@ -297,8 +310,11 @@ namespace nm
                     }
                     guiChangeM.OpenInformation();
 
+                    redValue.text = interactionM.targetObject.color.r.ToString("0.");
                     redSlider.value = interactionM.targetObject.color.r;
+                    greenValue.text = interactionM.targetObject.color.g.ToString("0.");
                     greenSlider.value = interactionM.targetObject.color.g;
+                    blueValue.text = interactionM.targetObject.color.b.ToString("0.");
                     blueSlider.value = interactionM.targetObject.color.b;
 
                     direction.isOn = interactionM.targetObject.Eo;
@@ -307,6 +323,12 @@ namespace nm
                     factorBendingValue.text = interactionM.targetObject.HeightArc.ToString("0.0");
                     arcAngleSlider.value = interactionM.targetObject.AngleArc;
                     arcAngleValue.text = interactionM.targetObject.AngleArc.ToString("0.");
+
+                    modelValue.text = interactionM.targetObject.NameModel;
+                    scaleModelValue.text = interactionM.targetObject.ScaleModel.ToString("0.0");
+                    sliderScaleModel.value = interactionM.targetObject.ScaleModel;
+                    scaleSelectorMarkerValue.text = interactionM.targetObject.ScaleSelectMarker.ToString("0.0");
+                    sliderScaleSelectorMarker.value = interactionM.targetObject.ScaleSelectMarker;
                 }
                 else
                 {
@@ -536,6 +558,61 @@ namespace nm
 
             DeleteObject(updateObject.gameObject);
             predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+        }
+
+        public void LoadModel(string filePath)
+        {
+            string _path = Path.GetDirectoryName(filePath);
+            string _nameModel = Path.GetFileName(filePath);
+
+            structureM.structure[freeCamera.selectedObject].NameModel = _nameModel;
+            modelValue.text = _nameModel;
+
+            List<GameObject> gameObjectList = structureM.structure[freeCamera.selectedObject].gameObject;
+            if (gameObjectList.Count == 1)
+            {
+                gameObjectList[0].GetComponent<DemoLoadObj>().LoadModel(_path, _nameModel);
+            }
+        }
+
+        public void ResetModel()
+        {
+            Structure updateObject = structureM.structure[freeCamera.selectedObject];
+            structureM.structure[freeCamera.selectedObject].NameModel = null;
+            modelValue.text = "";
+
+            DeleteObject(updateObject.gameObject);
+            predicateM.TactBuild(updateObject.Name, updateObject.ObjectType);
+        }
+
+        public void UpdateScaleModel(float value)
+        {
+            structureM.structure[freeCamera.selectedObject].ScaleModel = value;
+            scaleModelValue.text = value.ToString("0.0");
+
+            List<GameObject> gameObjectList = structureM.structure[freeCamera.selectedObject].gameObject;
+            if (gameObjectList.Count == 1)
+            {
+                gameObjectList[0].transform.localScale = new Vector3(value, value, value);
+            }
+        }
+
+        public void UpdateScaleSelectorMarker(float value)
+        {
+            structureM.structure[freeCamera.selectedObject].ScaleSelectMarker = value;
+            structureM.structure[freeCamera.selectedObject].ScaleSelectMarker = value;
+
+            scaleSelectorMarkerValue.text = value.ToString("0.0");
+            markerObject.transform.localScale = new Vector3(value, value, value);
+            GameObject graph = structureM.structure[freeCamera.selectedObject].gameObject[0];
+            graph.GetComponent<TooltipText>().sizeSelectMarker = value;
+        }
+
+        public void ResetScaleSetting()
+        {
+            InitObject initObjectM = InitObject.GetInstance();
+            UpdateScaleModel(initObjectM.defaultScaleGraph);
+            UpdateScaleSelectorMarker(initObjectM.defaultScaleSelectorMarker);
         }
 
     }

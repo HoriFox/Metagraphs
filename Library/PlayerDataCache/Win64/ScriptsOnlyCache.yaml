@@ -6,6 +6,7 @@ ScriptsOnlyBuild:
     - ButtonCameraView
     - ButtonPanel
     - ButtonSwitch
+    - DemoLoadObj
     - FPSDisplay
     - HeadbandCheck
     - InputFieldFocus
@@ -50,6 +51,7 @@ ScriptsOnlyBuild:
     - UnityEditor.Graphs.AnimatorControllerTool
     UnityEditor.TestRunner.dll:
     - UnityEditor.TestTools.TestRunner.Api.CallbacksHolder
+    - UnityEditor.TestTools.TestRunner.TestListCacheData
     UnityEngine.UI.dll:
     - UnityEngine.EventSystems.EventSystem
     - UnityEngine.EventSystems.EventTrigger
@@ -71,6 +73,7 @@ ScriptsOnlyBuild:
     - UnityEngine.UI.ToggleGroup
     - UnityEngine.UI.VerticalLayoutGroup
     com.unity.multiplayer-hlapi.Runtime.dll:
+    - UnityEngine.Networking.NetworkCallbacks
     - UnityEngine.Networking.NetworkIdentity
   sceneClasses:
     Assets/Scene/Basic.unity:
@@ -209,25 +212,27 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 11714}
     - Class: 114
-      Script: {instanceID: 11880}
+      Script: {instanceID: 11776}
     - Class: 114
-      Script: {instanceID: 11978}
+      Script: {instanceID: 11882}
     - Class: 114
-      Script: {instanceID: 12010}
+      Script: {instanceID: 11980}
     - Class: 114
-      Script: {instanceID: 12016}
+      Script: {instanceID: 12012}
     - Class: 114
-      Script: {instanceID: 12040}
+      Script: {instanceID: 12018}
     - Class: 114
-      Script: {instanceID: 12056}
+      Script: {instanceID: 12044}
     - Class: 114
-      Script: {instanceID: 12072}
+      Script: {instanceID: 12060}
     - Class: 114
-      Script: {instanceID: 12074}
+      Script: {instanceID: 12076}
     - Class: 114
-      Script: {instanceID: 12096}
+      Script: {instanceID: 12078}
     - Class: 114
-      Script: {instanceID: 12116}
+      Script: {instanceID: 12100}
+    - Class: 114
+      Script: {instanceID: 12120}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 120
@@ -313,7 +318,7 @@ ScriptsOnlyBuild:
     className: FPSDisplay
   - hash:
       serializedVersion: 2
-      Hash: 9b7b6d4bd1deed6e54b08696ca856ad8
+      Hash: 5f8dc983866d4f90fe6610628b2114fa
     assemblyName: Assembly-CSharp.dll
     namespaceName: nm
     className: ChangeModule
@@ -493,7 +498,7 @@ ScriptsOnlyBuild:
     className: Mask
   - hash:
       serializedVersion: 2
-      Hash: d17a9a74ca2eaea49c229e5f5b5c7260
+      Hash: a9643c09f250bec0694fa54e3ed59cfb
     assemblyName: Assembly-CSharp.dll
     namespaceName: nm
     className: InteractionModule
@@ -565,7 +570,7 @@ ScriptsOnlyBuild:
     className: Selectable
   - hash:
       serializedVersion: 2
-      Hash: 69863294b86c651eeb33d6ec8405c3ca
+      Hash: d46534c415fde7073c2379e402e41316
     assemblyName: Assembly-CSharp.dll
     namespaceName: nm
     className: TooltipText
@@ -589,7 +594,7 @@ ScriptsOnlyBuild:
     className: Reader
   - hash:
       serializedVersion: 2
-      Hash: d14e328f74b47b1627c3965604ea78a6
+      Hash: ddd71b52bb57526ef2879834cb056168
     assemblyName: Assembly-CSharp.dll
     namespaceName: nm
     className: InitObject
@@ -793,7 +798,7 @@ ScriptsOnlyBuild:
     className: CallbackExecutor
   - hash:
       serializedVersion: 2
-      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+      Hash: 1f5235880506c2fda42693ae6207d8d6
     assemblyName: Assembly-CSharp.dll
     namespaceName: nm
     className: LoadSaveDialog
@@ -911,6 +916,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: MarkerTrack
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: DemoLoadObj
   - hash:
       serializedVersion: 2
       Hash: d791aa6007fa3640be1164ea75bb087d
@@ -1060,4 +1071,4 @@ ScriptsOnlyBuild:
   - Assets/Scene/Basic.unity
   playerPath: "C:/Users/HoriFox/Desktop/\u041F\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043B\u0435\u043D\u0438\u0435
     \u043C\u0435\u0442\u0430\u0433\u0440\u0430\u0444\u043E\u0432/\u0420\u0430\u0431\u043E\u0447\u0430\u044F
-    \u0441\u0431\u043E\u0440\u043A\u0430 MetagraphEditor v 1.2/Metagraphs.exe"
+    \u0441\u0431\u043E\u0440\u043A\u0430 MetagraphEditor v 1.2 Dev/Metagraphs.exe"

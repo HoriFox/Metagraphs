@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 namespace nm
 {
@@ -14,13 +15,21 @@ namespace nm
             resourceM = ResourceManager.GetInstance();
         }
 
+        public static InitObject GetInstance()
+        {
+            return Instance;
+        }
+
         [HideInInspector] public ResourceManager resourceM;
 
         public Transform parentStandart;
         public Vector3 scaleLGraph = new Vector3(0.2f, 0.2f, 0.2f);
         public Vector3 scaleLink = new Vector3(0.05f, 0.05f, 0.05f);
 
-        public GameObject InitGraph(Vector3 position, Vector3 _scale, Color32 _color, string _name, Transform parent = null/*, bool Style3D = true*/)
+        public float defaultScaleGraph = 0.5f;
+        public float defaultScaleSelectorMarker = 0.6f;
+
+        public GameObject InitGraph(Vector3 position, Vector3 _scale, Color32 _color, string _name, string _nameModel, float _scaleSelectMarker, Transform parent = null)
         {
             Transform parentUse = parent ?? parentStandart;
             //string namePrefabObject = (Style3D) ? "GraphPrefab" : "2DVertexPrefab";
@@ -32,6 +41,21 @@ namespace nm
             TooltipText tT = objectVar.GetComponent<TooltipText>();
             tT.text = _name;
             tT.selectedContainer = Instantiate(prefabSelectedContainer, objectVar.transform);
+            tT.sizeSelectMarker = _scaleSelectMarker;
+
+            if (_nameModel != null)
+            {
+                string _path;
+                if (LoadSaveDialog.GetInstance().fileName != "")
+                {
+                    _path = Path.GetDirectoryName(LoadSaveDialog.GetInstance().fileName);
+                }
+                else
+                {
+                    _path = Application.dataPath + "/MetagraphEditorTemp";
+                }
+                objectVar.GetComponent<DemoLoadObj>().LoadModel(_path, _nameModel);
+            }
 
             objectVar.GetComponentInChildren<TextMesh>().text = _name;
             // Расчёт степени контрастности и соответствующего цвета.
@@ -70,11 +94,11 @@ namespace nm
         [Range(3, 20)]
         public int quality = 10;
 
-        [Range(0, 10)]
-        public int height;
+        //[Range(0, 10)]
+        //public int height;
 
-        [Range(0, 360)]
-        public int angle; // Поворот кривой линии.
+        //[Range(0, 360)]
+        //public int angle; // Поворот кривой линии.
 
         public List<GameObject> InitLine(bool isArc, float heightArc, float angleArc, bool isLGraph, Vector3 positionFirst, Vector3 positionSecond, bool isDirected, Color32 color, string _name, Transform parent = null, bool isSimple = false)
         {
@@ -128,6 +152,7 @@ namespace nm
                 GameObject selectMarker = Instantiate(prefabSelectedContainer, sphereFirst.transform);
                 selectMarker.transform.localScale = new Vector3(3f, 3f, 3f);
                 tT.selectedContainer = selectMarker;
+                tT.sizeSelectMarker = defaultScaleSelectorMarker;
 
                 GameObject sphereSecond = Instantiate(resourceM.GetPrefab("SpherePrefab"), positionSecond, Quaternion.identity, parentUse);
                 sphereSecond.transform.localScale = (isLGraph) ? scaleLGraph : scaleLink;
